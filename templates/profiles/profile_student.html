@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Profile</title>
+</head>
+<body>
+<ul class="navbar-nav">
+                  {% if user %}
+                    <li class="nav-item">
+                      <span class="nav-link">{{ user.username }}</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.logout') }}">退出登录</a>
+                    </li>
+                  {% else %}
+                    <li class="nav-item">
+                      <a class="nav-link" href="{{ url_for('auth.login') }}">登录</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.register') }}">注册</a>
+                    </li>
+                  {% endif %}
+                </ul>
+	<h1>Welcome: {{ user.username }}</h1>
+	<p>User Id: {{ user.id }}</p>
+    <p>User Role: {{ user.role }}</p>
+	<a href=" {{ url_for('auth.logout')}}">Log Out</a>
+</body>
+<script></script>
+</html>

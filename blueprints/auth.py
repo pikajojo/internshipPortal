@@ -1,13 +1,14 @@
 import random
 import string
 import uuid
+from datetime import timedelta
 
 from email_validator import validate_email
+from flask_login import login_user
 
 from blueprints.forms import Loginform, RegisterForm
 from mongoDb_connection.mongoDb_connection import find_document, insert_document
 from flask import Blueprint, render_template, request, session, jsonify, redirect, url_for, g
-from mongoDb_connection import *
 from exts import mail
 from flask_mail import Message
 
@@ -20,7 +21,7 @@ def login():
         return render_template('login.html')
     else:
         form = Loginform(request.form)
-        # 应该换成 邮箱 有唯一性
+        # 应该换成 邮箱 有唯一性 去搜索对应用户，这个命名有点问题，但是不影响使用
         user_email = find_document({"email": form.email.data})
 
         if not user_email:
@@ -30,9 +31,13 @@ def login():
             # cookie: 存放登录授权
             # session  经过加密后存在cookie
             session['id'] = user_email.get('id')
-            ## 加一下角色
-            ## 之后写profile页面的问题
-            return redirect(url_for('auth.profile'))
+            ## 加一下角色跳转不同profile
+            if user_email.get('role')=='admin':
+                return redirect(url_for('auth.profile_admin'))
+            elif user_email.get('role')=='staff':
+                return redirect(url_for('auth.profile_staff'))
+            else:
+                return redirect(url_for('auth.profile_student'))
         else:
             print(user_email.get('pwd'))
             print(form.password.data)
@@ -81,10 +86,20 @@ def register():
             return redirect(url_for('/register'))
         # 表单验证 flask-wtf:wtforms
 
-@bp.route("/profile", methods=['GET'])
-def profile():
-    return render_template("/profile.html")
-    # return "登录成功，进入个人页面"
+@bp.route("/profile_admin", methods=['GET'])
+def profile_admin():
+    return render_template("profiles/profile_admin.html")
+    # return "登录成功，进入管理员页面"
+
+@bp.route("/profile_staff", methods=['GET'])
+def profile_staff():
+    return render_template("profiles/profile_staff.html")
+    # return "登录成功，进入老师页面页面"
+
+@bp.route("/profile_student", methods=['GET'])
+def profile_student():
+    return render_template("profiles/profile_student.html")
+    # return "登录成功，进入学生页面"
 
 @bp.route("/logout")
 def logout():

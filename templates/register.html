@@ -99,16 +99,16 @@
 <!--                        <span class="focus-input100"></span>-->
 <!--                    </div>-->
 
-                    <div class="wrap-input100 validate-input m-b-18" data-validate="Email Required">
+                    <div class="wrap-input100 validate-input m-b-18" data-validate="Your Email  Required">
                         <span class="label-input100">Email</span>
                         <input class="input100" type="email" name="email" autocomplete="off">
                         <span class="focus-input100"></span>
                     </div>
 
-                    <div class="wrap-input100 validate-input m-b-18" data-validate="Role Required">
+                    <div class="wrap-input100 validate-input m-b-18" data-validate="Role Required" style="min-height: 45px ">
                         <span class="label-input100">Role</span>
-                        <select name = "role" required>
-                            <option value="" >Please Select</option>
+                        <select name = "role" required style="width: 100%; ;border-color: transparent;">
+                            <option value="" ></option>
                             <option value="student">Student</option>
                             <option value="staff">Staff</option>
                         </select>
@@ -117,31 +117,30 @@
                     <div class="wrap-input100 validate-input m-b-18" data-validate="Password Required">
                         <span class="label-input100">Verification Code</span>
                         <input class="input100" type="text" name="captcha" autocomplete="off">
-                        <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" type="button" id="captcha-btn">Get Verification Code</button>
+                        <div class="input-group-append" style="width:50%">
+                            <button class="btn btn-outline-secondary" type="button" id="captcha-btn" style="border-color: transparent;">Verification Code</button>
                         </div>
                         <span class="focus-input100"></span>
                     </div>
 
                     <div class="flex-sb-m w-full p-b-30">
-                        <div class="contact100-form-checkbox">
-                            <input class="input-checkbox100" id="ckb1" type="checkbox" name="remember-me">
-                            <label class="label-checkbox100" for="ckb1">
-                                Remember Me
-                            </label>
-                        </div>
-
-                        <div class="txt1">
-                            <span>Already have an account? </span>
-                            <a class="txt2" href="#">Log In</a>
-                        </div>
-
-                    </div>
-
-                    <div class="container-login100-form-btn">
+<!--                        <div class="contact100-form-checkbox">-->
+<!--                            <input class="input-checkbox100" id="ckb1" type="checkbox" name="remember-me">-->
+<!--                            <label class="label-checkbox100" for="ckb1">-->
+<!--                                Remember Me-->
+<!--                            </label>-->
+<!--                        </div>-->
+                        <div class="container-login100-form-btn">
                         <button class="login100-form-btn">
                             Register
                         </button>
+                    </div>
+
+                        <div class="txt1">
+                            <span>Already have an account? </span>
+                            <a class="txt2" href="{{ url_for('auth.login') }}">Log In</a>
+                        </div>
+
                     </div>
 
                 </form>
@@ -166,6 +165,7 @@
     <!--===============================================================================================-->
     <script src="js/main.js"></script>
     <script src="js/register.js"></script>
+
 
 </body>
 

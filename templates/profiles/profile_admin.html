@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Profile</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/bootstrap.4.6.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/init.css') }}">
+</head>
+<body>
+	<h1>Welcome: {{ user.username }}</h1>
+	<p>User Id: {{ user.id }}</p>
+    <p>User Role: {{ user.role }}</p>
+	<a href=" {{ url_for('auth.logout')}}">Log Out</a>
+</body>
+</html>
