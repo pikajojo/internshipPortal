@@ -1,16 +1,9 @@
 
-from flask import request, render_template, redirect, url_for, session, g, Flask
+from flask import  render_template,  session, g, Flask
 from blueprints.auth import bp as auth_bp
 
 from flask_mail import Mail
 from mongoDb_connection.mongoDb_connection import find_document
-
-
-# Todo
-# homepage.html [不做了]
-# 写文档 [慢慢写吧]
-
-
 
 app = Flask(__name__, static_url_path="/")
 ## SECRET_KEY config for session
@@ -28,11 +21,12 @@ mail = Mail(app)
 mail.init_app(app)
 app.register_blueprint(auth_bp)
 
+# setting login as homepage
 @app.route("/")
 def homepage():
-    return render_template("index.html")
+    return render_template("login.html")
 
-# 勾子函数（感觉是插队函数 hook 装饰器)
+# hook for g.user
 @app.before_request
 def before_request():
     user_id = session.get("id")
@@ -43,11 +37,11 @@ def before_request():
     else:
         setattr(g,"user",None)
 
+# return the g.user
 @app.context_processor
 def my_context_processor():
     return{"user":g.user}
 
 
-
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug = True)

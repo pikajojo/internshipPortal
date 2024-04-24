@@ -12,7 +12,7 @@
             else {
                 $(this).removeClass('has-val');
             }
-        })    
+        })
     })
 
     /*==================================================================
@@ -48,12 +48,12 @@
         else {
             if($(input).val().trim() == ''){
                 return false;
-            }
-        }
+           }
+       }
     }
 
     function showValidate(input) {
-        var thisAlert = $(input).parent();
+      var thisAlert = $(input).parent();
 
         $(thisAlert).addClass('alert-validate');
     }
@@ -61,8 +61,8 @@
     function hideValidate(input) {
         var thisAlert = $(input).parent();
 
-        $(thisAlert).removeClass('alert-validate');
+       $(thisAlert).removeClass('alert-validate');
     }
-    
+
 
 })(jQuery);

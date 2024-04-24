@@ -1,7 +1,0 @@
-# 邮箱配置
-MAIL_SERVER = "smtp.qq.com"
-MAIL_USE_SSL= True
-MAIL_PORT = 465
-MAIL_USERNAME = "2476131481@qq.com"
-MAIL_PASSWORD = "suexjnacipuqebjc"
-MAIL_DEFAULT_SENDER = "2476131481@qq.com"
