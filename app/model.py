@@ -10,7 +10,7 @@ class User(Document):
     password = StringField(required=True)
     email = EmailField(required=True)
     phone = StringField(required=True)
-    user_type = StringField(required=True)
+    role = StringField(required=True)
 
 
 class Company(User):

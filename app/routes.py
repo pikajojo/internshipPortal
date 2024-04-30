@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 # 现在你可以使用 Config 类来访问 DB 和 FS
 # DB = Config.DB
 # FS = Config.FS
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, session
 from app.forms import LoginForm
 
 
@@ -25,14 +25,43 @@ def home():
     return "Welcome to internship portal! Have a nice day!"
     # return redirect(url_for('main.login.html'))
 
+@main_blueprint.route('/student_home')
+def student_home():
+    #if 'role' in session and session['role'] == 'student':
+        #return render_template('student_home.html')
+    return "student home"
+
+    #return redirect(url_for('login'))
+
+@main_blueprint.route('/company_home')
+def company_home():
+    #if 'role' in session and session['role'] == 'company':
+    #    return render_template('company_home.html')
+    #return redirect(url_for('login'))
+    return "company home"
+
+@main_blueprint.route('/instructor_home')
+def instructor_home():
+    #if 'role' in session and session['role'] == 'instructor':
+    #    return render_template('instructor_home.html')
+    #return redirect(url_for('login'))
+    return "instructor home"
+
+
 
 @main_blueprint.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        if form.username.data == 'admin' and form.password.data == 'secret':
+        if form.username.data == 'student' and form.password.data == 'iamstudent':
             flash('You have been logged in!', 'success')
-            return redirect(url_for('main.home'))
+            return redirect(url_for('main.student_home'))
+        elif form.username.data == 'company' and form.password.data == 'iamcompany':
+                flash('You have been logged in!', 'success')
+                return redirect(url_for('main.company_home'))
+        elif form.username.data == 'instructor' and form.password.data == 'iaminstructor':
+                flash('You have been logged in!', 'success')
+                return redirect(url_for('main.instructor_home'))
         else:
             flash('Login Unsuccessful. Please check username and password', 'danger')
     return render_template('login.html', form=form)
@@ -76,7 +105,7 @@ def apply(company_id):
 
 @main_blueprint.route('/thank_you')
 def thank_you():
-    return "感谢您的申请，我们将尽快与您联系！"
+    return "Thanks for your application, we will contact you soon！"
 
 
 
