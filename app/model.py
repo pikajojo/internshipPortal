@@ -27,6 +27,17 @@ class Student(User):
     skills = StringField(required=True)
     education = StringField(required=True)
 
+class Instructor(User):
+    name = StringField(required=True)
+    title = StringField(required=True)
+    research_field = StringField(required=True)
+    school = StringField(required=True)
+
+class Application():
+    meta = {'allow_inheritance': True}
+    student = StringField(required=True)
+    company = StringField(required=True)
+    proposal = StringField(required=True)
 
 
 
