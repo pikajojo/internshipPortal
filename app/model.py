@@ -35,8 +35,9 @@ class Instructor(User):
 
 class Application():
     meta = {'allow_inheritance': True}
-    student = StringField(required=True)
-    company = StringField(required=True)
+    student_name = StringField(required=True)
+    student_email = EmailField(required=True)
+    company_name = StringField(required=True)
     proposal = StringField(required=True)
 
 

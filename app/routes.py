@@ -9,7 +9,9 @@ from werkzeug.utils import secure_filename
 # DB = Config.DB
 # FS = Config.FS
 from flask import render_template, flash, redirect, url_for, session
-from app.forms import LoginForm
+from app.forms import LoginForm, ApplicationForm
+from flask import request, redirect, url_for, render_template, flash
+from .model import Application, db
 
 
 # 创建一个蓝图对象，名为 'main'
@@ -89,26 +91,36 @@ companies = [
 def company():
     return render_template('company.html', companies=companies)
 
+
+
+
+
 @main_blueprint.route('/apply/<int:company_id>', methods=['GET', 'POST'])
 def apply(company_id):
     company = next((c for c in companies if c['id'] == company_id), None)
     if company is None:
         return "Company not found", 404
 
-    if request.method == 'POST':
-        # 这里处理提交的申请数据
-        # 比如：name = request.form['name']
+    form = ApplicationForm()
+
+    if request.method == 'POST' and form.validate_on_submit():
+        new_application = Application(
+            student_name=form.student_name.data,
+            student_email=form.student_email.data,
+            proposal=form.proposal.data,
+            company_name=company['name']
+        )
+        db.session.add(new_application)
+        db.session.commit()
+        flash('Application submitted successfully!')
         return redirect(url_for('thank_you'))
 
-    # 对于GET请求，显示申请表单
-    return render_template('apply.html', company=company)
+    return render_template('apply.html', form=form, company=company)
+
 
 @main_blueprint.route('/thank_you')
 def thank_you():
-    return "Thanks for your application, we will contact you soon！"
-
-
-
+    return "Thanks for your application, we will contact you soon!"
 
 
 @main_blueprint.route('/files')
