@@ -5,6 +5,7 @@ from .extensions import mongo, create_fs
 
 def create_app():
     app = Flask(__name__)
+    app.config['SECRET_KEY'] = 'your_random_secret_key_here'
     #app.config.from_object(Config)
 
     #初始化 PyMongo

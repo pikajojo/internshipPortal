@@ -8,6 +8,8 @@ from werkzeug.utils import secure_filename
 # 现在你可以使用 Config 类来访问 DB 和 FS
 # DB = Config.DB
 # FS = Config.FS
+from flask import render_template, flash, redirect, url_for
+from app.forms import LoginForm
 
 
 # 创建一个蓝图对象，名为 'main'
@@ -26,12 +28,14 @@ def home():
 
 @main_blueprint.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        # Process the login.html form submission here
-        # You would typically validate the credentials and log the user in.
-        pass
-    # Render the login.html templates if it's a GET request or credentials are invalid
-    return render_template('login.html')
+    form = LoginForm()
+    if form.validate_on_submit():
+        if form.username.data == 'admin' and form.password.data == 'secret':
+            flash('You have been logged in!', 'success')
+            return redirect(url_for('main.home'))
+        else:
+            flash('Login Unsuccessful. Please check username and password', 'danger')
+    return render_template('login.html', form=form)
 
 
 @main_blueprint.route('/register', methods=['GET', 'POST'])
