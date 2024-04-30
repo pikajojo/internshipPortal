@@ -44,6 +44,40 @@ def register():
     return render_template('register.html')
 
 
+
+# 模拟数据
+companies = [
+    {'name': 'Google', 'id': 1, 'url': 'http://www.google.com/careers'},
+    {'name': 'Facebook', 'id': 2, 'url': 'http://www.facebook.com/careers'},
+    {'name': 'Amazon', 'id': 3, 'url': 'http://www.amazon.jobs'}
+]
+
+@main_blueprint.route('/company', methods=['GET', 'POST'])
+def company():
+    return render_template('company.html', companies=companies)
+
+@main_blueprint.route('/apply/<int:company_id>', methods=['GET', 'POST'])
+def apply(company_id):
+    company = next((c for c in companies if c['id'] == company_id), None)
+    if company is None:
+        return "Company not found", 404
+
+    if request.method == 'POST':
+        # 这里处理提交的申请数据
+        # 比如：name = request.form['name']
+        return redirect(url_for('thank_you'))
+
+    # 对于GET请求，显示申请表单
+    return render_template('apply.html', company=company)
+
+@main_blueprint.route('/thank_you')
+def thank_you():
+    return "感谢您的申请，我们将尽快与您联系！"
+
+
+
+
+
 @main_blueprint.route('/files')
 def list_files():
     file_list = fs.list()
