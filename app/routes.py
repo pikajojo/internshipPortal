@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 from flask import render_template, flash, redirect, url_for, session
 from app.forms import LoginForm, ApplicationForm
 from flask import request, redirect, url_for, render_template, flash
-from .model import Application, db
+#from .model import Application, db
 
 
 # 创建一个蓝图对象，名为 'main'
@@ -95,23 +95,24 @@ def company():
 
 
 
-@main_blueprint.route('/apply/<int:company_id>', methods=['GET', 'POST'])
-def apply(company_id):
-    company = next((c for c in companies if c['id'] == company_id), None)
+@main_blueprint.route('/apply/<company_name>', methods=['GET', 'POST'])
+def apply(company_name):
+    company = next((c for c in companies if c['name'] == company_name), None)
     if company is None:
         return "Company not found", 404
 
     form = ApplicationForm()
 
     if request.method == 'POST' and form.validate_on_submit():
-        new_application = Application(
-            student_name=form.student_name.data,
-            student_email=form.student_email.data,
-            proposal=form.proposal.data,
-            company_name=company['name']
-        )
-        db.session.add(new_application)
-        db.session.commit()
+        #new_application = Application(
+        #    student_name=form.student_name.data,
+        #    student_email=form.student_email.data,
+        #    proposal=form.proposal.data,
+         #   company_name=company['name']
+        #)
+        #db.session.add(new_application)
+        #db.session.commit()
+        pass
         flash('Application submitted successfully!')
         return redirect(url_for('thank_you'))
 

@@ -33,7 +33,7 @@ class Instructor(User):
     research_field = StringField(required=True)
     school = StringField(required=True)
 
-class Application():
+class Application(Document):
     meta = {'allow_inheritance': True}
     student_name = StringField(required=True)
     student_email = EmailField(required=True)
