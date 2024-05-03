@@ -1,0 +1,51 @@
+# Python
+*.pyc
+__pycache__/
+venv/
+.env
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# React / Vite
+/dist/
+/.vite/
+/.npm/
+.vite-plugin-ssr/
+build/
+coverage/
+*.log
+
+# IDE
+.idea/
+*.iml
+.vscode/
+/.idea/
+.DS_Store
+
+# Compiled Python files
+*.pyc
+
+# Logs
+*.log
+
+# Mac OS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Vim
+.swp
+
+# Environment variables
+.env
+
+# Other
+*.bak
+
