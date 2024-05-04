@@ -1,4 +1,4 @@
-## 此装饰器为仅需要登录才能使用的页面服务
+## 此装饰器为 仅需要登录才能使用的页面服务
 from functools import wraps
 
 from flask import redirect, url_for, g

@@ -18,7 +18,7 @@ try:
 except Exception as e:
     print(e)
 
-## 数据库导入
+## import database
 db = client.users
 collection = db.db1
 for document in collection.find():
@@ -29,11 +29,6 @@ def insert_document(document):
 
 def find_document(query):
     return collection.find_one(query)
-
-# def find_specific_attr(query_dic,attr):
-#     data = collection.find_one(query_dic)
-#     attr = data.get(attr,f"{attr} not found")
-#     return attr
 
 def find_all_documents():
     return list(collection.find({}))

@@ -25,7 +25,7 @@ def login():
         if form.password.data == user_email.get('pwd'):
             # save the user into session
             session['id'] = user_email.get('id')
-            ## 加一下角色跳转不同profile
+            ## based on role jump into different profile
             if user_email.get('role') == 'admin':
                 return redirect(url_for('auth.profile_admin'))
             elif user_email.get('role') == 'staff':

@@ -14,7 +14,8 @@ app.config['MAIL_SERVER']= "smtp.qq.com"
 app.config['MAIL_USE_SSL']= True
 app.config['MAIL_PORT']= 465
 app.config['MAIL_USERNAME']= "2476131481@qq.com"
-app.config['MAIL_PASSWORD']= "suexjnacipuqebjc"
+## wrong password, correct one in own private repo
+app.config['MAIL_PASSWORD']= "--------"
 app.config['MAIL_DEFAULT_SENDER']= "2476131481@qq.com"
 
 mail = Mail(app)
