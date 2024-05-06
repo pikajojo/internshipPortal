@@ -24,17 +24,22 @@ collection = db.db1
 for document in collection.find():
     print(document)
 
+
 def insert_document(document):
     collection.insert_one(document)
+
 
 def find_document(query):
     return collection.find_one(query)
 
+
 def find_all_documents():
     return list(collection.find({}))
 
+
 def update_document(query, new_values):
     collection.update_one(query, {"$set": new_values})
+
 
 def delete_document(query):
     collection.delete_one(query)
