@@ -8,14 +8,16 @@ from auth import verify_token, login_required, user_required
 from config import MONGODB_CLIENT, DB
 import db_utils
 
-load_dotenv()
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
 
 app.config['SESSION_TYPE'] = "mongodb"
 app.config['SESSION_MONGODB'] = MONGODB_CLIENT
-app.config['SESSION_MONGODB_DB'] = os.getenv("MONGODB_DB")
-app.config['SESSION_MONGODB_COLLECTION'] = os.getenv("SESSION_MONGODB_COLLECTION")
+#app.config['SESSION_MONGODB_DB'] = os.getenv("MONGODB_DB")
+app.config['SESSION_MONGODB_DB'] = "apc"
+#app.config['SESSION_MONGODB_COLLECTION'] = os.getenv("SESSION_MONGODB_COLLECTION")
+app.config['SESSION_MONGODB_COLLECTION'] = "sessions"
 Session(app)
 
 

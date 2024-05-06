@@ -8,7 +8,7 @@ import google.auth.transport.requests
 def verify_token(token):
     try:
         info = id_token.verify_oauth2_token(token, google.auth.transport.requests.Request(),
-                                            os.getenv("GOOGLE_OAUTH_CLIENT_ID"))
+                                            "298770111102-pjqiii259fb57ue60428vfdbo0s2i0ko.apps.googleusercontent.com")
         return {"id": info["sub"], "email": info["email"]}, None
     except Exception as e:
         return None, e
