@@ -23,9 +23,10 @@ mail.init_app(app)
 app.register_blueprint(auth_bp)
 
 # setting login as homepage
-@app.route("/")
+@app.route("/", methods=['POST', 'GET'])
 def homepage():
-    return render_template("login.html")
+    return redirect('/login')
+    ## return render_template("login.html")
 
 # hook for g.user
 @app.before_request
