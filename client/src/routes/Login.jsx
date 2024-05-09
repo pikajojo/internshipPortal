@@ -14,7 +14,7 @@ function Login() {
   const [credentials, setCredentials] = useState({
     email: '',
     password: '',
-    user_type:''
+    user_type:'',
   });
 
   const handleChange = (e) => {
@@ -34,20 +34,29 @@ function Login() {
             },
             body: JSON.stringify(credentials) // 确保 credentials 在作用域内
         });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
+        console.log('Response status:', response.status);
+        console.log('Response status text:', response.statusText);
 
         const res = await response.json();
 
         if (res.status === 'success') {
-            navigate('/students', {replace: true});
+            // navigate('/students', {replace: true});
+            console.log(res.data);
+            auth.login(res.data, () => {
+                if (res.data.user_type === 'students'){
 
-        //   auth.login(res.data, () => {
-        //
-        //       navigate(res.data.user_type, {replace: true});
-        // })
+                    navigate('/students', {replace: true});
+                }
+                 if (res.data.user_type === 'companies'){
+
+                    navigate('/companies', {replace: true});
+                }
+                  if (res.data.user_type === 'instructors'){
+
+                    navigate('/instructors', {replace: true});
+                }
+              // navigate(res.data.user_type, {replace: true});
+        })
         }else {
             // 可以在这里处理登录失败的逻辑，例如显示错误消息
             console.error('Login failed:', res.message);

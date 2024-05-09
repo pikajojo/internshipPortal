@@ -28,8 +28,8 @@ Session(app)
 
 @app.get('/api/whoami')
 def whoami():
-    if session.get('email') is not None:
-        return jsonify(db_utils.load_user_info(session.get('user_type'), session.get('email'))), 200
+    if session['email'] is not None:
+        return jsonify(db_utils.load_user_info(session['user_type'], session['email'])), 200
     return jsonify({}), 200
 
 
@@ -38,6 +38,7 @@ def register():
     data = request.get_json()
     username = data['username']
     email = data['email']
+    user_type = data['user_type']
     # 检查数据库中是否存在相同的用户名或邮箱
     if DB.users.find_one({"$or": [{"username": username}, {"email": email}]}):
         return jsonify({'status': 'error', 'message': 'User already exists'})
@@ -49,7 +50,15 @@ def register():
     data['password'] = hashed
 
     result = DB.users.insert_one(data)
+
     if result.inserted_id:
+        if user_type == 'students':
+            DB.students.insert_one(data)
+        elif user_type == 'companies':
+            DB.companies.insert_one(data)
+        elif user_type == 'instructors':
+            DB.instructors.insert_one(data)
+
         return jsonify({'status': 'success', 'message': 'Registration successful'})
     else:
         return jsonify({'status': 'error', 'message': 'Registration failed'})
@@ -59,13 +68,25 @@ def register():
 def login():
     data = request.get_json()
     user = DB.users.find_one({'email': data['email']})
+    print(f"Received data: {data}")
+    print(f"Found user: {user}")
 
     if user and bcrypt.checkpw(data['password'].encode('utf-8'), user['password']):
         session['email'] = user['email']
         session['user_type'] = user['user_type']
-        return jsonify({'status': 'success', 'message': 'Login successful'})
+        print(session['email'])
+        print(session['user_type'])
+        # 在这里将 data 作为返回的 JSON 数据的一部分
+        return jsonify({
+            'status': 'success',
+            'message': 'Login successful',
+            'data': data  # 将 data 包含在返回的 JSON 中
+        }), 200
     else:
-        return jsonify({'status': 'error', 'message': 'Invalid username or password'})
+        return jsonify({
+            'status': 'error',
+            'message': 'Invalid username or password'
+        }), 401
 
 
 

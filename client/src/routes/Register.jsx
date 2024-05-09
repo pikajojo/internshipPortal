@@ -6,7 +6,7 @@ function Register({handleRegister}) {
     username: '',
     email: '',
     password: '',
-    user_type:''
+    user_type:'',
   });
 
   const [error, setError] = useState('');
