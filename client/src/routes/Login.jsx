@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import '../login.css';
 //import { handleLogin } from './root.jsx'; // 假设 handleLogin 在 auth.js 文件中定义
 
 import { AuthContext } from '../auth';
@@ -77,47 +77,84 @@ function Login() {
 
 
           return (
-              <div>
-                  <form onSubmit={handleSubmit}>
-                      <h2>Login</h2>
-                      <div>
-                          <label>Email</label>
-                          <input
-                              type="email"
-                              name="email"
-                              value={credentials.email}
-                              onChange={handleChange}
-                              required
-                          />
-                      </div>
-                      <div>
-                          <label>Password</label>
-                          <input
-                              type="password"
-                              name="password"
-                              value={credentials.password}
-                              onChange={handleChange}
-                              required
-                          />
-                      </div>
-                      <div>
-                          <label>Role</label>
-                          {/*<select name="user_type" value={credentials.user_type} onChange={handleChange}>*/}
-                          {/*        <option value="students">Student</option>*/}
-                          {/*        <option value="companies">Company</option>*/}
-                          {/*        <option value="instructors">Instructor</option>*/}
-                          {/*    </select>*/}
-                          <input
-                              type="text"
-                              name="user_type"
-                              value={credentials.user_type}
-                              onChange={handleChange}
-                              required
-                          />
-                      </div>
-                      <button type = 'submit'>Login</button>
-                  </form>
-              </div>
+              // <div>
+              //     <form onSubmit={handleSubmit}>
+              //         <h2>Login</h2>
+              //         <div>
+              //             <label>Email</label>
+              //             <input
+              //                 type="email"
+              //                 name="email"
+              //                 value={credentials.email}
+              //                 onChange={handleChange}
+              //                 required
+              //             />
+              //         </div>
+              //         <div>
+              //             <label>Password</label>
+              //             <input
+              //                 type="password"
+              //                 name="password"
+              //                 value={credentials.password}
+              //                 onChange={handleChange}
+              //                 required
+              //             />
+              //         </div>
+              //         <div>
+              //             <label>Role</label>
+              //             <input
+              //                 type="text"
+              //                 name="user_type"
+              //                 value={credentials.user_type}
+              //                 onChange={handleChange}
+              //                 required
+              //             />
+              //         </div>
+              //         <button type = 'submit'>Login</button>
+              //     </form>
+              // </div>
+              <div className="form-container">
+      <form onSubmit={handleSubmit} className="login-form">
+        <h2 className="form-title">Login</h2>
+        <div className="input-group">
+          <label htmlFor="email" className="input-label">Email</label>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            value={credentials.email}
+            onChange={handleChange}
+            className="input-field"
+            required
+          />
+        </div>
+        <div className="input-group">
+          <label htmlFor="password" className="input-label">Password</label>
+          <input
+            type="password"
+            name="password"
+            id="password"
+            value={credentials.password}
+            onChange={handleChange}
+            className="input-field"
+            required
+          />
+        </div>
+        <div className="input-group">
+          <label htmlFor="user_type" className="input-label">Role</label>
+          <input
+            type="text"
+            name="user_type"
+            id="user_type"
+            value={credentials.user_type}
+            onChange={handleChange}
+            className="input-field"
+            required
+          />
+        </div>
+        <button type="submit" className="form-button">Login</button>
+      </form>
+    </div>
           );
   };
 

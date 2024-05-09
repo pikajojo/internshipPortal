@@ -61,8 +61,6 @@ export default function Root() {
     });
 };
 
-
-
     const handleLogout = () => {
         axios.post("/api/logout");
         auth.logout(() => {
@@ -74,24 +72,17 @@ export default function Root() {
              <AuthProvider>
         <div>
 
-           <h1>Internship Portal</h1>
-                    {auth.userInfo ? (
-                        <Button variant="primary"
-                                onClick={handleLogout}>
-                            Logout
-                        </Button>
-                    ) : (
-                        <>
-          <Register handleRegister={handleRegister} />
-          <p>
-            Already have an account? <Link to="/login">Login here</Link>
-          </p>
-                            {/*<Login handleLogin={handleLogin} />*/}
-        </>
-                        )}
+           {/*<h1>Internship Portal</h1>*/}
+                    {auth.userInfo !== null ? (
+          <Button variant="primary" onClick={handleLogout}>
+            Logout
+          </Button>
+        ) : (
+          <>
+
             <Routes>
                          <Route index element={<Index />} />
-                         <Route path={"Register"} element={<Register />} />
+                         <Route path={"Register"} element={<Register handleRegister={handleRegister} />} />
                         <Route path={"Login"} element={<Login />} />
                          <Route path={"students"} element={<StudentLayout/>}>
                              <Route
@@ -126,7 +117,9 @@ export default function Root() {
                         {/*</Route>*/}
                 </Routes>
 
-        </div>
+       </>
+        )}
+      </div>
                  </AuthProvider>
 
     );

@@ -75,7 +75,7 @@ function InstructorCard(props) {
 export function StudentLayout() {
     const auth = useContext(AuthContext);
     return (
-        // <RequireAuth requiredUserType={'students'}>
+         <RequireAuth requiredUserType={'students'}>
             <div>
                 <ProfileCard {...(auth.userInfo)} />
                 <nav>
@@ -94,7 +94,7 @@ export function StudentLayout() {
                 <hr />
                 <Outlet />
             </div>
-        // </RequireAuth>
+         </RequireAuth>
     );
 }
 
@@ -110,7 +110,7 @@ export function StudentCompanies() {
     }, []);
 
     return (
-        // <RequireAuth requiredUserType={'students'}>
+         <RequireAuth requiredUserType={'students'}>
 
                 companies &&
                 <div>
@@ -121,7 +121,7 @@ export function StudentCompanies() {
                     }
                 </div>
 
-        // </RequireAuth>
+         </RequireAuth>
     );
 }
 
@@ -137,7 +137,7 @@ export function StudentInstructors() {
     }, []);
 
     return (
-        // <RequireAuth requiredUserType={'students'}>
+         <RequireAuth requiredUserType={'students'}>
             instructors &&
                 <div>
                     {
@@ -147,7 +147,7 @@ export function StudentInstructors() {
                     }
                 </div>
 
-        // </RequireAuth>
+         </RequireAuth>
     );
 }
 
