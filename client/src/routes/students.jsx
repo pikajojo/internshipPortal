@@ -111,7 +111,6 @@ export function StudentCompanies() {
 
     return (
          <RequireAuth requiredUserType={'students'}>
-
                 companies &&
                 <div>
                     {
@@ -142,7 +141,7 @@ export function StudentInstructors() {
                 <div>
                     {
                         instructors.map((instructor) => (
-                            <InstructorCard key={instructor.google_id} {...instructor} />
+                            <InstructorCard key={instructor.email} {...instructor} />
                         ))
                     }
                 </div>
@@ -153,26 +152,33 @@ export function StudentInstructors() {
 
 export function StudentEdit() {
     const [selectedFile, setSelectedFile] = useState(null);
-    // const [textInput, setTextInput] = useState('');
+    const [institute, setInstitute] = useState('');
+    const [major, setMajor] = useState('');
 
     const handleFileChange = (event) => {
         setSelectedFile(event.target.files[0]);
     };
 
-    // const handleTextChange = (event) => {
-    //     setTextInput(event.target.value);
-    // };
+      const handleInstituteChange = (event) => {
+        setInstitute(event.target.value);
+    };
+
+    const handleMajorChange = (event) => {
+        setMajor(event.target.value);
+    };
 
     const handleUpload = () => {
-        if (selectedFile) {
+        if (selectedFile && institute && major) {
             const formData = new FormData();
             formData.append('file', selectedFile);
+            formData.append('institute', institute);
+            formData.append('major', major);
             axios.post("/api/students/edit", formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             }).then((res) => {
-                window.alert('CV updated!');
+                window.alert('Information updated!');
                 console.log(res);
             }).catch((err) => {
                 window.alert("Something went wrong!");
@@ -184,13 +190,87 @@ export function StudentEdit() {
     return (
         // <RequireAuth requiredUserType={'students'}>
             <div>
-                <h2> Upload CV </h2>
-                <input type='file' onChange={handleFileChange} accept={".pdf"}/>
+                <h2> Upload CV / Proposal / CoverLetter </h2>
+                <label>
+                    Institute:
+                    <input type='text' value ={institute} onChange={handleInstituteChange} />
+                </label>
+                <label>
+                    Major:
+                    <input type='text' value ={major} onChange={handleMajorChange} />
+                </label>
+                <label>
+                    CV / Proposal / CoverLetter:
+                    <input type='file' onChange={handleFileChange} accept={".pdf"}/>
+                </label>
                 <button onClick={handleUpload}>Upload</button>
             </div>
         // </RequireAuth>
     )
 }
+// export function StudentEdit() {
+//     const [selectedFile, setSelectedFile] = useState(null);
+//     const [institute, setInstitute] = useState('');
+//     const [major, setMajor] = useState('');
+//
+//     const handleFileChange = (event) => {
+//         setSelectedFile(event.target.files[0]);
+//     };
+//
+//     const handleInstituteChange = (event) => {
+//         setInstitute(event.target.value);
+//     };
+//
+//     // const handleMajorChange = (event) => {
+//     //     setMajor(event.target.value);
+//     // };
+//
+//     const handleUpload = () => {
+//         const formData = new FormData();
+//         if (selectedFile) {
+//             formData.append('file', selectedFile);
+//         }
+//         // formData.append('institute', institute);
+//         // formData.append('major', major);
+//
+//         axios.post("/api/students/edit", formData, {
+//             headers: {
+//                 'Content-Type': 'multipart/form-data'
+//             }
+//         }).then((res) => {
+//             window.alert('Details updated successfully!');
+//             console.log(res);
+//         }).catch((err) => {
+//             window.alert("Something went wrong!");
+//             console.log(err);
+//         });
+//     }
+
+    // return (
+    //     <div>
+    //         <h2>Upload CV and Edit Details</h2>
+    //         <div>
+    //             <label>
+    //                 Institute:
+    //                 <input type='text' value={institute} onChange={handleInstituteChange} />
+    //             </label>
+    //         </div>
+    //         <div>
+    //             <label>
+    //                 Major:
+    //                 <input type='text' value={major} onChange={handleMajorChange} />
+    //             </label>
+    //         </div>
+    //         <div>
+    //             <label>
+    //                 CV / Proposal / CoverLetter (PDF):
+    //                 <input type='file' onChange={handleFileChange} accept={".pdf"} />
+    //             </label>
+    //         </div>
+    //         <button onClick={handleUpload}>Upload</button>
+    //     </div>
+    // );}
+
 
 
 
