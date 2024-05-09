@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import {createBrowserRouter, RouterProvider, BrowserRouter} from "react-router-dom";
+import {createBrowserRouter, RouterProvider, BrowserRouter, Router, Routes} from "react-router-dom";
 import './index.css'
 import Root from "./routes/root.jsx";
 import {AuthProvider} from "./auth.jsx";

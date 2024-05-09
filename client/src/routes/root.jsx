@@ -1,8 +1,8 @@
 import {
-    Outlet, Routes, Route, Link, useMatch, useResolvedPath, useNavigate, useLocation, Navigate
+    Outlet, Routes, Route, Link, useMatch, useResolvedPath, useNavigate, useLocation, Navigate, BrowserRouter
 } from "react-router-dom";
 import * as React from "react";
-import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+
 import axios from 'axios';
 import { Navbar, Nav, Button } from 'react-bootstrap';
 import {AuthProvider, RequireAuth, AuthContext} from "../auth.jsx";
@@ -19,29 +19,49 @@ import {
     // acceptedLoader as companyAcceptedLoader
 } from "./companies.jsx";
 
-const GOOGLE_OAUTH_CLIENT_ID = "298770111102-pjqiii259fb57ue60428vfdbo0s2i0ko.apps.googleusercontent.com";
+import Login from './Login.jsx';   // 引入登录组件
+import Register from './Register.jsx'; // 引入注册组件
+
+
+
+
+
+
+
+
+// const GOOGLE_OAUTH_CLIENT_ID = "298770111102-pjqiii259fb57ue60428vfdbo0s2i0ko.apps.googleusercontent.com";
 
 export default function Root() {
-     const auth = React.useContext(AuthContext);
-     // const location = useLocation();
-     const navigate = useNavigate();
+    const auth = React.useContext(AuthContext);
+    // const location = useLocation();
+    const navigate = useNavigate();
 
     React.useEffect(() => {
         axios.get("/api/whoami").then((res) => {
-            if (res.data.google_id) {
+            if (res.data.email) {
                 auth.setUserInfo(res.data);
             }
         });
     }, []);
 
-    const handleLogin = (res) => {
-        axios.post("/api/login", {token: res.credential})
-            .then((res) => {
-                auth.login(res.data, () => {
-                    navigate(res.data.user_type, {replace: true});
-                })
-        });
-    };
+
+
+    const handleRegister = (userData,  setError) => {
+  axios.post("/api/register", userData)
+    .then((res) => {
+      navigate('/login', { replace: true });
+    })
+    .catch((error) => {
+      // 处理错误，例如显示错误消息
+      if (error.response){
+          setError(error.response.data.message);
+      }else{
+          setError('Register failed, please try again later.')
+      }
+    });
+};
+
+
 
     const handleLogout = () => {
         axios.post("/api/logout");
@@ -50,28 +70,31 @@ export default function Root() {
         });
     }
 
-    return (
-        <GoogleOAuthProvider clientId={GOOGLE_OAUTH_CLIENT_ID}>
-            {/*<AuthProvider>*/}
-                <div>
-                    <h1>Internship Portal</h1>
+        return (
+             <AuthProvider>
+        <div>
+
+           <h1>Internship Portal</h1>
                     {auth.userInfo ? (
                         <Button variant="primary"
                                 onClick={handleLogout}>
                             Logout
                         </Button>
                     ) : (
-                        <GoogleLogin
-                            onSuccess={handleLogin}
-                            onError={() => {
-                                console.log('Login Failed');
-                            }}
-                        />
-                    )}
-                    <Routes>
-                        <Route index element={<Index />} />
-                        <Route path={"students"} element={<StudentLayout/>}>
-                            <Route
+                        <>
+          <Register handleRegister={handleRegister} />
+          <p>
+            Already have an account? <Link to="/login">Login here</Link>
+          </p>
+                            {/*<Login handleLogin={handleLogin} />*/}
+        </>
+                        )}
+            <Routes>
+                         <Route index element={<Index />} />
+                         <Route path={"Register"} element={<Register />} />
+                        <Route path={"Login"} element={<Login />} />
+                         <Route path={"students"} element={<StudentLayout/>}>
+                             <Route
                                 index
                                 element={<StudentCompanies/>}
                                 // loader={studentCompaniesLoader}
@@ -101,9 +124,12 @@ export default function Root() {
                         {/*    <Route index element={<InstructorStudents/>}/>*/}
                         {/*    <Route path={"*"} element={<Ops/>}/>*/}
                         {/*</Route>*/}
-                    </Routes>
-                </div>
-            {/*</AuthProvider>*/}
-        </GoogleOAuthProvider>
+                </Routes>
+
+        </div>
+                 </AuthProvider>
+
     );
+
 }
+

@@ -29,7 +29,7 @@ export function AuthProvider({ children }) {
 export function RequireAuth({children, requiredUserType}) {
     const auth = React.useContext(AuthContext);
     const location = useLocation();
-    if(!auth.userInfo || auth.userInfo.user_type != requiredUserType) {
+    if(!auth.userInfo || auth.userInfo.user_type !== requiredUserType) {
         return <Navigate to={"/"} state={{ from: location }} replace={true} />;
     }
     return children;

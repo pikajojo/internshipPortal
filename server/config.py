@@ -11,6 +11,7 @@ MONGODB_URI = "mongodb+srv://bursaeacid0c:uQ0GGRYZaXAM08Pw@cluster0.l0vrjlo.mong
 #MONGODB_DB = os.getenv("MONGODB_DB")
 MONGODB_DB = "apc"
 # Create MongoDB client and database instance
-MONGODB_CLIENT = MongoClient(MONGODB_URI, server_api=ServerApi(ServerApiVersion.V1))
+MONGODB_CLIENT = MongoClient(MONGODB_URI)
 DB = MONGODB_CLIENT[MONGODB_DB]
+#DB=MONGODB_CLIENT.test
 FS = GridFS(DB)

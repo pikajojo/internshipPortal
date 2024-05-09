@@ -1,12 +1,17 @@
 import os
 import requests
 import tempfile
+
+import werkzeug
 from dotenv import load_dotenv
-from flask import Flask, Response, request, jsonify, session, abort, redirect
+from flask import Flask, Response, request, jsonify, session, abort, redirect, make_response
 from flask_session import Session
-from auth import verify_token, login_required, user_required
+from auth import verify_user, login_required, user_required
 from config import MONGODB_CLIENT, DB
 import db_utils
+import bcrypt
+
+
 
 
 app = Flask(__name__)
@@ -23,32 +28,50 @@ Session(app)
 
 @app.get('/api/whoami')
 def whoami():
-    if session.get('google_id') is not None:
-        return jsonify(db_utils.load_user_info(session.get('user_type'), session.get('google_id'))), 200
+    if session.get('email') is not None:
+        return jsonify(db_utils.load_user_info(session.get('user_type'), session.get('email'))), 200
     return jsonify({}), 200
+
+
+@app.route('/api/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    username = data['username']
+    email = data['email']
+    # 检查数据库中是否存在相同的用户名或邮箱
+    if DB.users.find_one({"$or": [{"username": username}, {"email": email}]}):
+        return jsonify({'status': 'error', 'message': 'User already exists'})
+
+    # 用户不存在, 可以进行注册
+    password = data['password'].encode('utf-8')
+    hashed = bcrypt.hashpw(password, bcrypt.gensalt())
+    #hashed = werkzeug.security.generate_password_hash(password)
+    data['password'] = hashed
+
+    result = DB.users.insert_one(data)
+    if result.inserted_id:
+        return jsonify({'status': 'success', 'message': 'Registration successful'})
+    else:
+        return jsonify({'status': 'error', 'message': 'Registration failed'})
 
 
 @app.post('/api/login')
 def login():
-    info, e = verify_token(request.json.get('token'))
-    if info is None:
-        return e, abort(400)
-    user = DB.users.find_one({'google_id': info['email']})
-    if user is None:
-        return "Unknown User", abort(401)
-    # "type" field of users collection should always be plural
-    # in order to be consistent with the collection name of each
-    # user type in the database so that it can be directly used
-    # for indexing a collection
-    user_info = db_utils.load_user_info(user['user_type'], user['google_id'])
-    session['google_id'] = user['google_id']
-    session['user_type'] = user['user_type']
-    return jsonify(user_info), 200
+    data = request.get_json()
+    user = DB.users.find_one({'email': data['email']})
+
+    if user and bcrypt.checkpw(data['password'].encode('utf-8'), user['password']):
+        session['email'] = user['email']
+        session['user_type'] = user['user_type']
+        return jsonify({'status': 'success', 'message': 'Login successful'})
+    else:
+        return jsonify({'status': 'error', 'message': 'Invalid username or password'})
+
 
 
 @app.post('/api/logout')
 def logout():
-    session.pop('google_id')
+    session.pop('email')
     session.pop('user_type')
     return jsonify({}), 200
 
@@ -56,7 +79,7 @@ def logout():
 @app.post('/api/students/edit')
 @user_required(user_type='students')
 def students_edit():
-    student_id = session.get('google_id')
+    student_id = session.get('email')
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
 
@@ -83,27 +106,27 @@ def students_edit():
 @app.get('/api/students/companies')
 @user_required(user_type='students')
 def students_companies():
-    companies = db_utils.load_companies_for_student(session.get('google_id'))
+    companies = db_utils.load_companies_for_student(session.get('email'))
     return jsonify(companies), 200
 
 
 @app.get('/api/students/instructors')
 @user_required(user_type='students')
 def students_instructors():
-    instructors = db_utils.load_instructors_for_student(session.get('google_id'))
+    instructors = db_utils.load_instructors_for_student(session.get('email'))
     return jsonify(instructors), 200
 
 
 @app.post('/api/students/apply')
 @user_required(user_type='students')
 def students_apply():
-    student_id = session.get('google_id')
-    student_query = {'google_id': student_id}
+    student_id = session.get('email')
+    student_query = {'email': student_id}
     student_info = DB.students.find_one(student_query)
     if student_info['cv'] is None:
         return "No CV found", 400
-    company_id = request.json.get('company_id')
-    company_query = {'google_id': company_id}
+    company_id = request.json.get('email')
+    company_query = {'email': company_id}
     company_info = DB.companies.find_one(company_query)
     if ((company_info is None)
             or (student_id in company_info['pending'])
@@ -118,7 +141,7 @@ def students_apply():
 @app.get('/api/companies/pending')
 @user_required(user_type='companies')
 def companies_pending():
-    company_id = session.get('google_id')
+    company_id = session.get('email')
     pending = db_utils.load_students_for_company(company_id, 'pending')
     return jsonify(pending), 200
 
@@ -126,7 +149,7 @@ def companies_pending():
 @app.get('/api/companies/accepted')
 @user_required(user_type='companies')
 def companies_accepted():
-    company_id = session.get('google_id')
+    company_id = session.get('email')
     accepted = db_utils.load_students_for_company(company_id, 'accepted')
     return jsonify(accepted), 200
 
@@ -145,7 +168,7 @@ def companies_accept():
     company_query = {'google_id': company_id}
     company_info = DB.companies.find_one(company_query)
     student_id = request.json.get('student_id')
-    student_query = {'google_id': student_id}
+    student_query = {'email': student_id}
     student_info = DB.students.find_one(student_query)
 
     if ((student_info is None)
@@ -169,8 +192,8 @@ def companies_refuse():
     company_id = session.get('company_id')
     student_id = request.json.get('student_id')
 
-    DB.students.update_one({'google_id': student_id}, {"$pull": {'pending': company_id}})
-    DB.companies.update_one({'google_id': company_id}, {"$pull": {'pending': student_id}})
+    DB.students.update_one({'email': student_id}, {"$pull": {'pending': company_id}})
+    DB.companies.update_one({'email': company_id}, {"$pull": {'pending': student_id}})
 
     return jsonify({}), 200
 
@@ -181,8 +204,8 @@ def companies_cease():
     company_id = session.get('company_id')
     student_id = request.json.get('student_id')
 
-    DB.students.update_one({'google_id': student_id}, {"$pull": {'accepted': company_id}})
-    DB.companies.update_one({'google_id': company_id}, {"$pull": {'accepted': student_id}})
+    DB.students.update_one({'email': student_id}, {"$pull": {'accepted': company_id}})
+    DB.companies.update_one({'email': company_id}, {"$pull": {'accepted': student_id}})
 
     return jsonify({}), 200
 

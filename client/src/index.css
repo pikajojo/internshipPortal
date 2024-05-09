@@ -6,3 +6,9 @@
     width: 100%;
 }
 .avatar { border-radius: 50%; height: 90px; }
+
+.error {
+    color: red;
+    font-size: 16px;
+    /* 其他可能的样式 */
+}

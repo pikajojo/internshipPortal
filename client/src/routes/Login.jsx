@@ -1,0 +1,115 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+//import { handleLogin } from './root.jsx'; // 假设 handleLogin 在 auth.js 文件中定义
+
+import { AuthContext } from '../auth';
+import axios from "axios"; // 导入你的 AuthContext
+
+
+function Login() {
+
+    const auth = React.useContext(AuthContext);
+  const navigate = useNavigate();
+  const [credentials, setCredentials] = useState({
+    email: '',
+    password: '',
+    user_type:''
+  });
+
+  const handleChange = (e) => {
+    setCredentials({
+      ...credentials,
+      [e.target.name]: e.target.value
+    });
+  };
+
+ const handleSubmit = async (e) => {
+    e.preventDefault(); // 阻止表单默认提交行为
+    try {
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(credentials) // 确保 credentials 在作用域内
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const res = await response.json();
+
+        if (res.status === 'success') {
+            navigate('/students', {replace: true});
+
+        //   auth.login(res.data, () => {
+        //
+        //       navigate(res.data.user_type, {replace: true});
+        // })
+        }else {
+            // 可以在这里处理登录失败的逻辑，例如显示错误消息
+            console.error('Login failed:', res.message);
+        }
+    } catch (error) {
+        // 处理网络错误或者其他错误
+        console.error('Login error:', error);
+    }
+};
+//   function handleLogin(res) {
+//         axios.post("/api/login",res)
+//             .then((res) => {
+//                 auth.login(res.data, () => {
+//                     navigate(res.data.user_type, {replace: true});
+//                 })
+//             });
+//     };
+
+
+          return (
+              <div>
+                  <form onSubmit={handleSubmit}>
+                      <h2>Login</h2>
+                      <div>
+                          <label>Email</label>
+                          <input
+                              type="email"
+                              name="email"
+                              value={credentials.email}
+                              onChange={handleChange}
+                              required
+                          />
+                      </div>
+                      <div>
+                          <label>Password</label>
+                          <input
+                              type="password"
+                              name="password"
+                              value={credentials.password}
+                              onChange={handleChange}
+                              required
+                          />
+                      </div>
+                      <div>
+                          <label>Role</label>
+                          {/*<select name="user_type" value={credentials.user_type} onChange={handleChange}>*/}
+                          {/*        <option value="students">Student</option>*/}
+                          {/*        <option value="companies">Company</option>*/}
+                          {/*        <option value="instructors">Instructor</option>*/}
+                          {/*    </select>*/}
+                          <input
+                              type="text"
+                              name="user_type"
+                              value={credentials.user_type}
+                              onChange={handleChange}
+                              required
+                          />
+                      </div>
+                      <button type = 'submit'>Login</button>
+                  </form>
+              </div>
+          );
+  };
+
+export default Login;

@@ -6,16 +6,16 @@ def load_all_companies(n=None):
 
 
 def load_companies_for_student(student_id):
-    student = DB['students'].find_one({'google_id': student_id})
+    student = DB['students'].find_one({'email': student_id})
 
     def mapper(company):
-        keep = ['google_id', 'name', 'email', 'location',
+        keep = ['name', 'email', 'location',
                 'phone', 'website', 'logo', 'description']
         res = {k: company.get(k, None) for k in keep}
         res['state'] = 'none'
-        if res['google_id'] in student['accepted']:
+        if res['email'] in student['accepted']:
             res['state'] = 'accept'
-        elif res['google_id'] in student['pending']:
+        elif res['email'] in student['pending']:
             res['state'] = 'pending'
         # res['_id'] = str(company['_id'])
         return res
@@ -23,16 +23,16 @@ def load_companies_for_student(student_id):
     return list(map(mapper, load_all_companies()))
 
 def load_instructors_for_student(student_id):
-    student = DB['students'].find_one({'google_id': student_id})
+    student = DB['students'].find_one({'email': student_id})
     def mapper(instructor):
-        keep = ['google_id', 'name', 'email', 'institute',
+        keep = ['name', 'email', 'institute',
                 'avatar']
         return {k: instructor.get(k, None) for k in keep}
 
 def load_user_raw_info(user_type, user_id):
     if user_type not in DB.list_collection_names():
         return None
-    return DB[user_type].find_one({'google_id': user_id})
+    return DB[user_type].find_one({'email': user_id})
 
 def load_user_info(user_type, user_id):
     res = load_user_raw_info(user_type, user_id)
@@ -43,7 +43,7 @@ def load_user_info(user_type, user_id):
 
 def update_cv(student_id, file, filename):
     file_id = FS.put(file, filename=secure_filename(filename))
-    DB['students'].update_one({'google_id': student_id},
+    DB['students'].update_one({'email': student_id},
                               {'$set': {'cv': str(file_id)}})
 
 def load_file(file_id):
@@ -51,13 +51,13 @@ def load_file(file_id):
 
 def load_students_for_company(company_id, state):
     def mapper(student_id):
-        student_info = DB['students'].find({'google_id': student_id})
+        student_info = DB['students'].find({'email': student_id})
         if student_info is None:
             return None
-        keep = ['google_id', 'name', 'email', 'institute',
+        keep = ['name', 'email', 'institute',
                 'cv', 'avatar']
         return {k: student_info.get(k, None) for k in keep}
-    company_info = DB.companies.find_one({'google_id': company_id})
+    company_info = DB.companies.find_one({'email': company_id})
     if company_info is None:
         return None
     return list(map(mapper, company_info[state]))

@@ -23,7 +23,7 @@ function CompanyCard(props) {
         setShowDetail(!showDetail)
     };
     const handleApply = () => {
-        axios.post("/api/students/apply", {"company_id": props.google_id})
+        axios.post("/api/students/apply", {"company_id": props.email})
             .then((res) => {
                 if(res.status >= 200 && res.status < 300) {
                     window.alert('Submitted!');
@@ -75,7 +75,7 @@ function InstructorCard(props) {
 export function StudentLayout() {
     const auth = useContext(AuthContext);
     return (
-        <RequireAuth requiredUserType={'students'}>
+        // <RequireAuth requiredUserType={'students'}>
             <div>
                 <ProfileCard {...(auth.userInfo)} />
                 <nav>
@@ -94,7 +94,7 @@ export function StudentLayout() {
                 <hr />
                 <Outlet />
             </div>
-        </RequireAuth>
+        // </RequireAuth>
     );
 }
 
@@ -110,18 +110,18 @@ export function StudentCompanies() {
     }, []);
 
     return (
-        <RequireAuth requiredUserType={'students'}>
-            {
+        // <RequireAuth requiredUserType={'students'}>
+
                 companies &&
                 <div>
                     {
                         companies.map((company) => (
-                            <CompanyCard key={company.google_id} {...company} />
+                            <CompanyCard key={company.email} {...company} />
                         ))
                     }
                 </div>
-            }
-        </RequireAuth>
+
+        // </RequireAuth>
     );
 }
 
@@ -137,8 +137,8 @@ export function StudentInstructors() {
     }, []);
 
     return (
-        <RequireAuth requiredUserType={'students'}>
-            {instructors &&
+        // <RequireAuth requiredUserType={'students'}>
+            instructors &&
                 <div>
                     {
                         instructors.map((instructor) => (
@@ -146,8 +146,8 @@ export function StudentInstructors() {
                         ))
                     }
                 </div>
-            }
-        </RequireAuth>
+
+        // </RequireAuth>
     );
 }
 
@@ -182,13 +182,13 @@ export function StudentEdit() {
     }
 
     return (
-        <RequireAuth requiredUserType={'students'}>
+        // <RequireAuth requiredUserType={'students'}>
             <div>
                 <h2> Upload CV </h2>
                 <input type='file' onChange={handleFileChange} accept={".pdf"}/>
                 <button onClick={handleUpload}>Upload</button>
             </div>
-        </RequireAuth>
+        // </RequireAuth>
     )
 }
 
