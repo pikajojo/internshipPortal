@@ -129,49 +129,12 @@ def students_edit():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# @app.post('/api/students/edit')
-# @user_required(user_type='students')
-# def students_edit():
-#     student_id = session.get('email')
-#
-#     # Check for the file part in the request
-#     # if 'file' not in request.files and not all(k in request.form for k in ['institute']):
-#     if 'file' not in request.files:
-#         return jsonify({'error': 'No data provided'}), 400
-#
-#     file = request.files.get('file')
-#     # institute = request.form.get('institute')
-#     # major = request.form.get('major')
-#
-#     # Save file if present
-#     if file and file.filename != '':
-#         try:
-#             temp_file = tempfile.NamedTemporaryFile(delete=False)
-#             file.save(temp_file.name)
-#
-#             with open(temp_file.name, 'rb') as f:
-#                 content = f.read()
-#
-#             db_utils.update_cv(student_id, content, file.filename)
-#             os.unlink(temp_file.name)
-#         except Exception as e:
-#             return jsonify({'error': str(e)}), 500
-
-    # Update institute and major
-    # try:
-    #     if institute:
-    #         db_utils.update_institute(student_id, institute)
-    #     if major:
-    #          db_utils.update_major(student_id, major)
-    #     return jsonify({'success': True}), 200
-    # except Exception as e:
-    #     return jsonify({'error': str(e)}), 500
-
 
 @app.get('/api/students/companies')
 @user_required(user_type='students')
 def students_companies():
     companies = db_utils.load_companies_for_student(session.get('email'))
+    # companies = db_utils.load_all_companies(session.get('email'))
     return jsonify(companies), 200
 
 
