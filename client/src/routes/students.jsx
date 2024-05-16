@@ -81,7 +81,7 @@ export function StudentLayout() {
                 <nav>
                     <ul>
                         <li>
-                            <CustomLink to={"/students"}>Companies</CustomLink>
+                            <CustomLink to={"/students/companies"}>Companies</CustomLink>
                         </li>
                         <li>
                             <CustomLink to={"/students/instructors"}>Instructors</CustomLink>
@@ -111,15 +111,15 @@ export function StudentCompanies() {
 
     return (
          <RequireAuth requiredUserType={'students'}>
-                companies &&
-                <div>
-                    {
-                        companies.map((company) => (
-                            <CompanyCard key={company.email} {...company} />
-                        ))
-                    }
-                </div>
-
+               {companies && companies.length > 0 ? (
+        <div>
+          {companies.map((company) => (
+            <CompanyCard key={company.email} {...company} />
+          ))}
+        </div>
+      ) : (
+        <p>No companies available.</p>
+      )}
          </RequireAuth>
     );
 }

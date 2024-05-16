@@ -85,11 +85,12 @@ export default function Root() {
                          <Route path={"Register"} element={<Register handleRegister={handleRegister} />} />
                         <Route path={"Login"} element={<Login />} />
                          <Route path={"students"} element={<StudentLayout/>}>
-                             <Route
-                                index
-                                element={<StudentCompanies/>}
-                                // loader={studentCompaniesLoader}
-                            />
+                            {/* <Route*/}
+                            {/*    index*/}
+                            {/*    element={<StudentCompanies/>}*/}
+                            {/*    // loader={studentCompaniesLoader}*/}
+                            {/*/>*/}
+                             <Route path={"companies"} element={<StudentCompanies />} />
                             <Route
                                 path={"instructors"}
                                 element={<StudentInstructors/>}

@@ -6,22 +6,41 @@ def load_all_companies(n=None):
     return list(DB['companies'].find())
 
 
+# def load_companies_for_student(student_id):
+#     student = DB['students'].find_one({'email': student_id})
+#
+#     def mapper(company):
+#         keep = ['name', 'email', 'location',
+#                 'phone', 'website', 'logo', 'description']
+#         res = {k: company.get(k, None) for k in keep}
+#         res['state'] = 'none'
+#         if res['email'] in student['accepted']:
+#             res['state'] = 'accept'
+#         elif res['email'] in student['pending']:
+#             res['state'] = 'pending'
+#         # res['_id'] = str(company['_id'])
+#         return res
+#
+#     return list(map(mapper, load_all_companies()))
+
+
 def load_companies_for_student(student_id):
     student = DB['students'].find_one({'email': student_id})
 
     def mapper(company):
-        keep = ['name', 'email', 'location',
-                'phone', 'website', 'logo', 'description']
+        keep = ['google_id','name', 'email', 'location', 'phone', 'website', 'logo', 'description']
         res = {k: company.get(k, None) for k in keep}
-        res['state'] = 'none'
-        if res['email'] in student['accepted']:
+        res['state'] = 'none'  # 默认状态为 apply
+
+        if res['email'] in student.get('accepted', []):
             res['state'] = 'accept'
-        elif res['email'] in student['pending']:
+        elif res['email'] in student.get('pending', []):
             res['state'] = 'pending'
-        # res['_id'] = str(company['_id'])
+
         return res
 
-    return list(map(mapper, load_all_companies()))
+    all_companies = list(DB['companies'].find())  # 获取所有公司
+    return list(map(mapper, all_companies))
 
 
 def load_instructors_for_student(student_id):

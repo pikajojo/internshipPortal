@@ -44,10 +44,11 @@ def register():
         return jsonify({'status': 'error', 'message': 'User already exists'})
 
     # 用户不存在, 可以进行注册
-    password = data['password'].encode('utf-8')
-    hashed = bcrypt.hashpw(password, bcrypt.gensalt())
+    # password = data['password'].encode('utf-8')
+    # hashed = bcrypt.hashpw(password, bcrypt.gensalt())
     #hashed = werkzeug.security.generate_password_hash(password)
-    data['password'] = hashed
+    #data['password'] = hashed
+
 
     result = DB.users.insert_one(data)
 
@@ -71,7 +72,8 @@ def login():
     print(f"Received data: {data}")
     print(f"Found user: {user}")
 
-    if user and bcrypt.checkpw(data['password'].encode('utf-8'), user['password']):
+    # if user and bcrypt.checkpw(data['password'].encode('utf-8'), user['password']):
+    if user and data['password'] == user['password']:
         session['email'] = user['email']
         session['user_type'] = user['user_type']
         print(session['email'])
@@ -153,7 +155,7 @@ def students_apply():
     student_info = DB.students.find_one(student_query)
     if student_info['cv'] is None:
         return "No CV found", 400
-    company_id = request.json.get('email')
+    company_id = request.json.get('company_id')
     company_query = {'email': company_id}
     company_info = DB.companies.find_one(company_query)
     if ((company_info is None)
