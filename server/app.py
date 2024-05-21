@@ -2,7 +2,7 @@ import os
 import requests
 import tempfile
 from dotenv import load_dotenv
-from flask import Flask, Response, request, jsonify, session, abort, redirect
+from flask import Flask, Response, request, jsonify, session, abort, redirect, send_file
 from flask_session import Session
 from auth import verify_token, login_required, user_required
 from config import MONGODB_CLIENT, DB
@@ -132,8 +132,11 @@ def companies_accepted():
 @app.post('/api/companies/cv')
 @user_required(user_type='companies')
 def companies_cv():
-    file = db_utils.load_file(request.json.get('file_id'))
-    return Response(file, content_type='application/pdf')
+    file, filename = db_utils.load_file(request.json.get('file_id'))
+    return send_file(file,
+                     as_attachment=True,
+                     mimetype='application/pdf',
+                     download_name=filename)
 
 
 @app.post('/api/companies/accept')
