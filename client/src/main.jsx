@@ -38,6 +38,25 @@ import {AuthProvider} from "./auth.jsx";
 //     }
 // ]);
 
+// import App from './App';
+// import { CompanyPending } from './routes/companies.jsx';
+// import { pendingLoader } from './routes/companies.jsx';
+//
+// const router = createBrowserRouter([
+//   {
+//     path: '/',
+//     element: <App />,
+//     children: [
+//       {
+//         path: 'companies/pending',
+//         element: <CompanyPending />,
+//         loader: pendingLoader,
+//       },
+//     ],
+//   },
+// ]);
+
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
       {/*<RouterProvider router={router} />*/}

@@ -5,6 +5,8 @@ import tempfile
 import werkzeug
 from dotenv import load_dotenv
 from flask import Flask, Response, request, jsonify, session, abort, redirect, make_response
+from flask import Flask, request, send_file, jsonify
+import io
 from flask_session import Session
 from auth import verify_user, login_required, user_required
 from config import MONGODB_CLIENT, DB
@@ -184,29 +186,53 @@ def companies_accepted():
     return jsonify(accepted), 200
 
 
-@app.post('/api/companies/cv')
-@user_required(user_type='companies')
+# @app.post('/api/companies/cv')
+# @user_required(user_type='companies')
+# def companies_cv():
+#     file = db_utils.load_file(request.json.get('file_id'))
+#     return Response(file, content_type='application/pdf')
+
+@app.route('/api/companies/cv', methods=['POST'])
 def companies_cv():
-    file = db_utils.load_file(request.json.get('file_id'))
-    return Response(file, content_type='application/pdf')
+    try:
+        data = request.json
+        file_id = data.get('file_id')
+        if not file_id:
+            return jsonify({'error': 'file_id is required'}), 400
+
+        # 使用 load_file 函数从文件系统中加载文件
+        file_data = db_utils.load_file(file_id)
+        if file_data is None:
+            return jsonify({'error': 'File not found'}), 404
+
+        return send_file(
+            io.BytesIO(file_data.read()),
+            mimetype='application/pdf',
+            as_attachment=True,
+            download_name='cv.pdf'
+        )
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @app.post('/api/companies/accept')
 @user_required(user_type='companies')
 def companies_accept():
-    company_id = session.get('company_id')
-    company_query = {'google_id': company_id}
+    company_id = session.get('email')
+    # company_id = session.get('email')
+    company_query = {'email': company_id}
     company_info = DB.companies.find_one(company_query)
     student_id = request.json.get('student_id')
+
     student_query = {'email': student_id}
     student_info = DB.students.find_one(student_query)
 
     if ((student_info is None)
-            or (company_info is None)
-            or (student_id not in company_info['pending'])
-            or (student_id in company_info['accepted'])
-            or (company_id not in student_info['pending'])
-            or (company_id in student_info['accepted'])):
+            or (company_info is None)):
+            # or (student_id not in company_info['pending'])
+            # or (student_id in company_info['accepted'])
+            # or (company_id not in student_info['pending'])
+            # or (company_id in student_info['accepted'])):
         abort(400)
 
     DB.students.update_one(student_query, {"$addToSet": {'accepted': company_id}})

@@ -1,4 +1,4 @@
-import {useState, useContext} from "react";
+import {useState, useContext, useEffect} from "react";
 import {CustomLink} from "../custom.jsx";
 import {Outlet, useLoaderData} from "react-router-dom";
 import axios from "axios";
@@ -43,7 +43,7 @@ export async function pendingLoader() {
 
 function PendingCard(props) {
     const handleAccept = () => {
-        axios.post("/api/companies/accept", { student_id: props.google_id})
+        axios.post("/api/companies/accept", { student_id: props.email})
             .then(res => {
             console.log('Candidate accepted: ', res.data);
             })
@@ -53,7 +53,7 @@ function PendingCard(props) {
     };
 
     const handleReject = () => {
-        axios.post("/api/companies/reject", { student_id: props.google_id})
+        axios.post("/api/companies/reject", { student_id: props.email})
             .then(res => {
                 console.log('Candidate rejected: ', res.data);
             })
@@ -62,23 +62,23 @@ function PendingCard(props) {
             });
     };
 
-    const handleDownload = () => {
-        axios.post("/api/companies/cv", {file_id: props.cv})
-            .then(res => {
-            const blob = new Blob([res.data], { type: 'application/pdf' });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', props.name + '_cv.pdf');
-            document.body.appendChild(link);
-            link.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(link);
-            })
-            .catch(error => {
-            console.error('Error downloading CV:', error);
-            });
-    }
+  const handleDownload = () => {
+  axios.post('/api/companies/cv', { file_id: props.cv })
+    .then((res) => {
+      const blob = new Blob([res.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', props.name + '_cv.pdf');
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    })
+    .catch((error) => {
+      console.error('Error downloading CV:', error);
+    });
+};
 
     return (
         <div>
@@ -93,13 +93,38 @@ function PendingCard(props) {
 }
 
 export function CompanyPending() {
-    const pendings = useLoaderData();
+  const [pendings, setPendings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get('/api/companies/pending');
+        setPendings(res.data);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+   fetchData();
+  }, []);
+
+  if (loading) {
+    return <div>loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
     return (
         <RequireAuth requiredUserType={'companies'}>
             <div>
             {
                     pendings.map((pending) => (
-                        <PendingCard key={pending.google_id} {...pending} />
+                        <PendingCard key={pending.email} {...pending} />
                     ))
                 }
             </div>
@@ -114,7 +139,7 @@ export async function acceptedLoader() {
 
 function AcceptedCard(props) {
     const handleCease = () => {
-        axios.post("/api/companies/cease", { student_id: props.google_id})
+        axios.post("/api/companies/cease", { student_id: props.email})
             .then(res => {
                 console.log('Contract terminated: ', res.data);
             })

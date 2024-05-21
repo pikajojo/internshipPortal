@@ -104,7 +104,7 @@ def load_file(file_id):
 
 def load_students_for_company(company_id, state):
     def mapper(student_id):
-        student_info = DB['students'].find({'email': student_id})
+        student_info = DB['students'].find_one({'email': student_id})
         if student_info is None:
             return None
         keep = ['name', 'email', 'institute',
