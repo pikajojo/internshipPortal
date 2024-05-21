@@ -1,4 +1,6 @@
 import os
+from datetime import datetime
+
 import requests
 import tempfile
 
@@ -270,6 +272,42 @@ def companies_cease():
 @user_required(user_type='instructors')
 def instructors_students():
     pass
+
+@app.post('/api/messages/send')
+@login_required
+def send_message():
+    data = request.get_json()
+    sender = session['email']
+    recipient = data['recipient']
+    message = data['message']
+
+    sender_user = DB.users.find_one({'email': sender})
+    recipient_user = DB.users.find_one({'email': recipient})
+
+    if not sender_user or not recipient_user:
+        return jsonify({'status': 'error', 'message': 'Invalid sender or recipient'}), 400
+
+    message_entry = {
+        'sender': sender,
+        'recipient': recipient,
+        'message': message,
+        'timestamp': datetime.datetime.utcnow()
+    }
+
+    DB.messages.insert_one(message_entry)
+
+    return jsonify({'status': 'success', 'message': 'Message sent'}), 200
+
+@app.get('/api/messages')
+@login_required
+def get_messages():
+    user_email = session['email']
+    messages = list(DB.messages.find({'recipient': user_email}))
+
+    for message in messages:
+        message['_id'] = str(message['_id'])
+
+    return jsonify(messages), 200
 
 
 if __name__ == '__main__':

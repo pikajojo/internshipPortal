@@ -19,13 +19,17 @@ function ProfileCard(props) {
 
 function CompanyCard(props) {
     const [showDetail, setShowDetail] = useState(false);
+    const [showMessageForm, setShowMessageForm] = useState(false);
     const toggleDetail = () => {
         setShowDetail(!showDetail)
+    };
+    const toggleMessageForm = () => {
+        setShowMessageForm(!showMessageForm);
     };
     const handleApply = () => {
         axios.post("/api/students/apply", {"company_id": props.email})
             .then((res) => {
-                if(res.status >= 200 && res.status < 300) {
+                if (res.status >= 200 && res.status < 300) {
                     window.alert('Submitted!');
                 } else {
                     window.alert('Application failed! Please try again later and ' +
@@ -33,6 +37,7 @@ function CompanyCard(props) {
                 }
             })
     }
+
     return (
         <div>
             <h2>{props.name}</h2>
@@ -53,11 +58,43 @@ function CompanyCard(props) {
                 {showDetail ? 'Hide detail' : 'Show detail'}
             </button>
             <button onClick={handleApply} disabled={props.state !== 'none'}>
-                {props.state === 'none' ? "Apply": props.state === 'accepted' ? "Accepted" : "Pending"}
+                {props.state === 'none' ? "Apply" : props.state === 'accepted' ? "Accepted" : "Pending"}
             </button>
+            <button onClick={toggleMessageForm}>
+                {showMessageForm ? 'Hide Message Form' : 'Send Message'}
+            </button>
+            {showMessageForm && <MessageForm recipient={props.email} />}
         </div>
     );
 }
+
+function MessageForm({ recipient }) {
+    const [message, setMessage] = useState("");
+
+    const handleMessageChange = (e) => {
+        setMessage(e.target.value);
+    };
+
+    const handleMessageSend = () => {
+        axios.post("/api/messages/send", { recipient, message })
+            .then((res) => {
+                if (res.status >= 200 && res.status < 300) {
+                    window.alert('Message sent!');
+                } else {
+                    window.alert('Failed to send message.');
+                }
+            });
+    };
+
+    return (
+        <div>
+            <textarea value={message} onChange={handleMessageChange} placeholder="Write your message here..." />
+            <button onClick={handleMessageSend}>Send Message</button>
+        </div>
+    );
+}
+
+
 
 function InstructorCard(props) {
     return (

@@ -42,6 +42,10 @@ export async function pendingLoader() {
 }
 
 function PendingCard(props) {
+    const [showMessageForm, setShowMessageForm] = useState(false);
+    const toggleMessageForm = () => {
+        setShowMessageForm(!showMessageForm);
+    };
     const handleAccept = () => {
         axios.post("/api/companies/accept", { student_id: props.email})
             .then(res => {
@@ -88,6 +92,36 @@ function PendingCard(props) {
             <button onClick={handleAccept}>Accept</button>
             <button onClick={handleReject}>Reject</button>
             <button onClick={handleDownload}>Download CV</button>
+            <button onClick={toggleMessageForm}>
+                {showMessageForm ? 'Hide Message Form' : 'Send Message'}
+            </button>
+            {showMessageForm && <MessageForm recipient={props.email} />}
+        </div>
+    );
+}
+
+function MessageForm({ recipient }) {
+    const [message, setMessage] = useState("");
+
+    const handleMessageChange = (e) => {
+        setMessage(e.target.value);
+    };
+
+    const handleMessageSend = () => {
+        axios.post("/api/messages/send", { recipient, message })
+            .then((res) => {
+                if (res.status >= 200 && res.status < 300) {
+                    window.alert('Message sent!');
+                } else {
+                    window.alert('Failed to send message.');
+                }
+            });
+    };
+
+    return (
+        <div>
+            <textarea value={message} onChange={handleMessageChange} placeholder="Write your message here..." />
+            <button onClick={handleMessageSend}>Send Message</button>
         </div>
     );
 }
@@ -138,6 +172,10 @@ export async function acceptedLoader() {
 }
 
 function AcceptedCard(props) {
+    const [showMessageForm, setShowMessageForm] = useState(false);
+    const toggleMessageForm = () => {
+        setShowMessageForm(!showMessageForm);
+    };
     const handleCease = () => {
         axios.post("/api/companies/cease", { student_id: props.email})
             .then(res => {
@@ -154,6 +192,10 @@ function AcceptedCard(props) {
             <p>Email: {props.email}</p>
             <p>Institute: {props.institute}</p>
             <button onClick={handleCease}>Cease</button>
+            <button onClick={toggleMessageForm}>
+                {showMessageForm ? 'Hide Message Form' : 'Send Message'}
+            </button>
+            {showMessageForm && <MessageForm recipient={props.email} />}
         </div>
     );
 
