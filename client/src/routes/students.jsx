@@ -1,8 +1,9 @@
-import {useState, useContext, useEffect} from "react";
-import {CustomLink} from "../custom.jsx";
-import {Outlet, useLoaderData} from "react-router-dom";
+import { useState, useContext, useEffect } from "react";
+import { CustomLink } from "../custom.jsx";
+import { Outlet } from "react-router-dom";
 import axios from "axios";
 import { AuthContext, RequireAuth } from "../auth.jsx";
+import { InboxCard } from "./InboxCard.jsx";
 
 function ProfileCard(props) {
     return (
@@ -94,8 +95,6 @@ function MessageForm({ recipient }) {
     );
 }
 
-
-
 function InstructorCard(props) {
     return (
         <div>
@@ -109,10 +108,25 @@ function InstructorCard(props) {
     );
 }
 
+
 export function StudentLayout() {
     const auth = useContext(AuthContext);
+    const [messages, setMessages] = useState([]);
+    const [newMessageCount, setNewMessageCount] = useState(0);
+
+    useEffect(() => {
+        axios.get("/api/messages/inbox")
+            .then((res) => {
+                setMessages(res.data);
+                setNewMessageCount(res.data.filter(message => !message.read).length);
+            })
+            .catch((err) => {
+                console.error("Failed to fetch messages", err);
+            });
+    }, []);
+
     return (
-         <RequireAuth requiredUserType={'students'}>
+        <RequireAuth requiredUserType={'students'}>
             <div>
                 <ProfileCard {...(auth.userInfo)} />
                 <nav>
@@ -126,12 +140,18 @@ export function StudentLayout() {
                         <li>
                             <CustomLink to={"/students/edit"}>Edit</CustomLink>
                         </li>
+                        <li>
+                            <CustomLink to={"/students/inbox"}>
+                                Inbox {newMessageCount > 0 && `(${newMessageCount} new)`}
+                            </CustomLink>
+                        </li>
                     </ul>
                 </nav>
                 <hr />
                 <Outlet />
+                <InboxCard messages={messages} />
             </div>
-         </RequireAuth>
+        </RequireAuth>
     );
 }
 
@@ -225,90 +245,21 @@ export function StudentEdit() {
     }
 
     return (
-        // <RequireAuth requiredUserType={'students'}>
-            <div>
-                <h2> Upload CV / Proposal / CoverLetter </h2>
-                <label>
-                    Institute:
-                    <input type='text' value ={institute} onChange={handleInstituteChange} />
-                </label>
-                <label>
-                    Major:
-                    <input type='text' value ={major} onChange={handleMajorChange} />
-                </label>
-                <label>
-                    CV / Proposal / CoverLetter:
-                    <input type='file' onChange={handleFileChange} accept={".pdf"}/>
-                </label>
-                <button onClick={handleUpload}>Upload</button>
-            </div>
-        // </RequireAuth>
+        <div>
+            <h2> Upload CV / Proposal / CoverLetter </h2>
+            <label>
+                Institute:
+                <input type='text' value ={institute} onChange={handleInstituteChange} />
+            </label>
+            <label>
+                Major:
+                <input type='text' value ={major} onChange={handleMajorChange} />
+            </label>
+            <label>
+                CV / Proposal / CoverLetter:
+                <input type='file' onChange={handleFileChange} accept={".pdf"}/>
+            </label>
+            <button onClick={handleUpload}>Upload</button>
+        </div>
     )
 }
-// export function StudentEdit() {
-//     const [selectedFile, setSelectedFile] = useState(null);
-//     const [institute, setInstitute] = useState('');
-//     const [major, setMajor] = useState('');
-//
-//     const handleFileChange = (event) => {
-//         setSelectedFile(event.target.files[0]);
-//     };
-//
-//     const handleInstituteChange = (event) => {
-//         setInstitute(event.target.value);
-//     };
-//
-//     // const handleMajorChange = (event) => {
-//     //     setMajor(event.target.value);
-//     // };
-//
-//     const handleUpload = () => {
-//         const formData = new FormData();
-//         if (selectedFile) {
-//             formData.append('file', selectedFile);
-//         }
-//         // formData.append('institute', institute);
-//         // formData.append('major', major);
-//
-//         axios.post("/api/students/edit", formData, {
-//             headers: {
-//                 'Content-Type': 'multipart/form-data'
-//             }
-//         }).then((res) => {
-//             window.alert('Details updated successfully!');
-//             console.log(res);
-//         }).catch((err) => {
-//             window.alert("Something went wrong!");
-//             console.log(err);
-//         });
-//     }
-
-    // return (
-    //     <div>
-    //         <h2>Upload CV and Edit Details</h2>
-    //         <div>
-    //             <label>
-    //                 Institute:
-    //                 <input type='text' value={institute} onChange={handleInstituteChange} />
-    //             </label>
-    //         </div>
-    //         <div>
-    //             <label>
-    //                 Major:
-    //                 <input type='text' value={major} onChange={handleMajorChange} />
-    //             </label>
-    //         </div>
-    //         <div>
-    //             <label>
-    //                 CV / Proposal / CoverLetter (PDF):
-    //                 <input type='file' onChange={handleFileChange} accept={".pdf"} />
-    //             </label>
-    //         </div>
-    //         <button onClick={handleUpload}>Upload</button>
-    //     </div>
-    // );}
-
-
-
-
-
