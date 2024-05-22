@@ -22,7 +22,11 @@ import {
 import Login from './Login.jsx';   // 引入登录组件
 import Register from './Register.jsx'; // 引入注册组件
 
-
+import {
+    InstructorLayout, InstructorToReview, InstructorReviewed, reviewedLoader, toReviewLoader
+    // pendingLoader as companyPendingLoader,
+    // acceptedLoader as companyAcceptedLoader
+} from "./instructors.jsx";
 
 
 
@@ -68,55 +72,56 @@ export default function Root() {
         });
     }
 
-        return (
-             <AuthProvider>
-        <div>
+    return (
+        <AuthProvider>
+            <div>
 
-           {/*<h1>Internship Portal</h1>*/}
-                    {auth.userInfo !== null ? (
-          <Button variant="primary" onClick={handleLogout}>
-            Logout
-          </Button>
-        ) : (
-          <>
+                {/*<h1>Internship Portal</h1>*/}
+                {auth.userInfo !== null ? (
+                    <Button variant="primary" onClick={handleLogout}>
+                        Logout
+                    </Button>
+                ) : (
+                    <>
 
-            <Routes>
-                         <Route index element={<Index />} />
-                         <Route path={"Register"} element={<Register handleRegister={handleRegister} />} />
-                        <Route path={"Login"} element={<Login />} />
-                         <Route path={"students"} element={<StudentLayout/>}>
-                            {/* <Route*/}
-                            {/*    index*/}
-                            {/*    element={<StudentCompanies/>}*/}
-                            {/*    // loader={studentCompaniesLoader}*/}
-                            {/*/>*/}
-                             <Route path={"companies"} element={<StudentCompanies />} />
-                            <Route
-                                path={"instructors"}
-                                element={<StudentInstructors/>}
-                                // loader={studentInstructorsLoader}
-                            />
-                            <Route path={"edit"} element={<StudentEdit/>}/>
-                            <Route path={"*"} element={<NotFoundPage/>}/>
-                        </Route>
-                        <Route path={"companies"} element={<CompanyLayout/>}>
-                            <Route
-                                index
-                                element={<CompanyPending/>}
-                                // loader={pendingLoader}
-                            />
-                            <Route
-                                path={"accepted"}
-                                element={<CompanyAccepted/>}
-                                // loader={companyAcceptedLoader}
-                            />
-                            <Route path={"*"} element={<NotFoundPage/>}/>
-                        </Route>
-                        {/*<Route path={"instructors"} element={<InstructorLayout/>}>*/}
-                        {/*    <Route index element={<InstructorStudents/>}/>*/}
-                        {/*    <Route path={"*"} element={<Ops/>}/>*/}
-                        {/*</Route>*/}
-                </Routes>
+                        <Routes>
+                            <Route index element={<Index/>}/>
+                            <Route path={"Register"} element={<Register handleRegister={handleRegister}/>}/>
+                            <Route path={"Login"} element={<Login/>}/>
+                            <Route path={"students"} element={<StudentLayout/>}>
+                                {/* <Route*/}
+                                {/*    index*/}
+                                {/*    element={<StudentCompanies/>}*/}
+                                {/*    // loader={studentCompaniesLoader}*/}
+                                {/*/>*/}
+                                <Route path={"companies"} element={<StudentCompanies/>}/>
+                                <Route
+                                    path={"instructors"}
+                                    element={<StudentInstructors/>}
+                                    // loader={studentInstructorsLoader}
+                                />
+                                <Route path={"edit"} element={<StudentEdit/>}/>
+                                <Route path={"*"} element={<NotFoundPage/>}/>
+                            </Route>
+                            <Route path={"companies"} element={<CompanyLayout/>}>
+                                <Route
+                                    index
+                                    element={<CompanyPending/>}
+                                    // loader={pendingLoader}
+                                />
+                                <Route
+                                    path={"accepted"}
+                                    element={<CompanyAccepted/>}
+                                    // loader={companyAcceptedLoader}
+                                />
+                                <Route path={"*"} element={<NotFoundPage/>}/>
+                            </Route>
+                            <Route path={"instructors"} element={<InstructorLayout/>}>
+                                <Route index element={<InstructorToReview/>}/>
+                                <Route path="reviewed" element={<InstructorReviewed/>}/>
+                                <Route path={"*"} element={<Ops/>}/>
+                            </Route>
+                        </Routes>
 
        </>
         )}
