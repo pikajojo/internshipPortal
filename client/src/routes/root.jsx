@@ -14,7 +14,7 @@ import {
     // instructorsLoader as studentInstructorsLoader
 } from "./students.jsx";
 import {
-    CompanyLayout, CompanyPending, CompanyAccepted, pendingLoader,
+    CompanyLayout, CompanyPending, CompanyAccepted, CompanyMessages, pendingLoader,
     // pendingLoader as companyPendingLoader,
     // acceptedLoader as companyAcceptedLoader
 } from "./companies.jsx";
@@ -110,6 +110,7 @@ export default function Root() {
                                 element={<CompanyAccepted/>}
                                 // loader={companyAcceptedLoader}
                             />
+                            <Route path={"messages"} element={<CompanyMessages/>} />
                             <Route path={"*"} element={<NotFoundPage/>}/>
                         </Route>
                         {/*<Route path={"instructors"} element={<InstructorLayout/>}>*/}

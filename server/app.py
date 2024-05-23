@@ -272,5 +272,39 @@ def instructors_students():
     pass
 
 
+@app.post('/api/students/message')
+@user_required(user_type='students')
+def students_send_message():
+    student_id = session.get('email')
+    company_id = request.json.get('company_id')
+    message = request.json.get('message')
+    student_info = DB.students.find_one({'email': student_id})
+
+    if not student_info or not company_id or not message:
+        return jsonify({'error': 'Invalid input'}), 400
+
+    message_data = {
+        'student_email': student_id,
+        'student_name': student_info['name'],
+        'company_email': company_id,
+        'message': message
+    }
+
+    result = DB.messages.insert_one(message_data)
+
+    if result.inserted_id:
+        return jsonify({'success': True}), 200
+    else:
+        return jsonify({'error': 'Failed to send message'}), 500
+
+
+@app.get('/api/companies/messages')
+@user_required(user_type='companies')
+def companies_get_messages():
+    company_id = session.get('email')
+    messages = list(DB.messages.find({'company_email': company_id}))
+    return jsonify(messages), 200
+
+
 if __name__ == '__main__':
     app.run()

@@ -13,8 +13,18 @@ function ProfileCard(props) {
     );
 }
 
+function MessageCard(props) {
+    return (
+        <div>
+            <h3>From: {props.studentName} ({props.studentEmail})</h3>
+            <p>{props.message}</p>
+        </div>
+    );
+}
+
 export function CompanyLayout() {
     const auth = useContext(AuthContext);
+
     return (
         <RequireAuth requiredUserType={'companies'}>
             <div>
@@ -27,6 +37,9 @@ export function CompanyLayout() {
                         <li>
                             <CustomLink to={"/companies/accepted"}>Accepted</CustomLink>
                         </li>
+                        <li>
+                            <CustomLink to={"/companies/messages"}>Messages</CustomLink>
+                        </li>
                     </ul>
                 </nav>
                 <hr />
@@ -34,6 +47,30 @@ export function CompanyLayout() {
             </div>
         </RequireAuth>
     )
+}
+
+export function CompanyMessages() {
+    const [messages, setMessages] = useState([]);
+
+    useEffect(() => {
+        axios.get("/api/companies/messages").then((res) => {
+            setMessages(res.data);
+        });
+    }, []);
+
+    return (
+        <RequireAuth requiredUserType={'companies'}>
+            <div>
+                {messages.length > 0 ? (
+                    messages.map((message) => (
+                        <MessageCard key={message._id} {...message} />
+                    ))
+                ) : (
+                    <p>No messages available.</p>
+                )}
+            </div>
+        </RequireAuth>
+    );
 }
 
 export async function pendingLoader() {

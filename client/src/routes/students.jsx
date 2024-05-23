@@ -19,9 +19,11 @@ function ProfileCard(props) {
 
 function CompanyCard(props) {
     const [showDetail, setShowDetail] = useState(false);
+    const [message, setMessage] = useState('');
     const toggleDetail = () => {
         setShowDetail(!showDetail)
     };
+
     const handleApply = () => {
         axios.post("/api/students/apply", {"company_id": props.email})
             .then((res) => {
@@ -32,7 +34,20 @@ function CompanyCard(props) {
                         'double-check that your resume has been uploaded correctly.');
                 }
             })
-    }
+    };
+
+    const handleSendMessage = () => {
+        axios.post("/api/students/message", {"company_id": props.email, "message": message})
+            .then((res) => {
+                if(res.status >= 200 && res.status < 300) {
+                    window.alert('Message sent!');
+                    setMessage('');
+                } else {
+                    window.alert('Message sending failed! Please try again later.');
+                }
+            })
+    };
+
     return (
         <div>
             <h2>{props.name}</h2>
@@ -55,6 +70,10 @@ function CompanyCard(props) {
             <button onClick={handleApply} disabled={props.state !== 'none'}>
                 {props.state === 'none' ? "Apply": props.state === 'accepted' ? "Accepted" : "Pending"}
             </button>
+            <div>
+                <textarea value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Write your message here..."></textarea>
+                <button onClick={handleSendMessage}>Send Message</button>
+            </div>
         </div>
     );
 }

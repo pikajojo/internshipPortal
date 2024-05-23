@@ -16,3 +16,4 @@ MONGODB_CLIENT = MongoClient(MONGODB_URI)
 DB = MONGODB_CLIENT[MONGODB_DB]
 #DB=MONGODB_CLIENT.test
 FS = GridFS(DB)
+DB.messages = DB['messages']

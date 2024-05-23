@@ -115,3 +115,15 @@ def load_students_for_company(company_id, state):
     if company_info is None:
         return None
     return list(map(mapper, company_info[state]))
+
+
+def add_message(student_email, company_email, message):
+    DB.messages.insert_one({
+        'student_email': student_email,
+        'company_email': company_email,
+        'message': message
+    })
+
+
+def get_messages_for_company(company_email):
+    return list(DB.messages.find({'company_email': company_email}))
