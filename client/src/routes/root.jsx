@@ -117,9 +117,13 @@ export default function Root() {
                                 <Route path={"*"} element={<NotFoundPage/>}/>
                             </Route>
                             <Route path={"instructors"} element={<InstructorLayout/>}>
-                                <Route index element={<InstructorToReview/>}/>
-                                <Route path="reviewed" element={<InstructorReviewed/>}/>
-                                <Route path={"*"} element={<Ops/>}/>
+                                <Route index element={<InstructorToReview/>}
+                                    // loader={toReviewLoader}
+                                    />
+                                <Route path="reviewed" element={<InstructorReviewed/>}
+                                    // loader={ReviewedLoader}
+                                />
+                                <Route path={"*"} element={<NotFoundPage/>}/>
                             </Route>
                         </Routes>
 

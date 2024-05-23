@@ -16,16 +16,16 @@ from server.config import DB
 #
 # }
 
-new_data = {
-    "name": "apple",
-    "email": "appleinfo@gmail.com",
-    "password": "12345678",
-    "user_type":"companies",
-    "description":"good good good",
-    "location":'USA',
-    "pending":[],
-    "accepted":[],
-}
+# new_data = {
+#     "name": "apple",
+#     "email": "appleinfo@gmail.com",
+#     "password": "12345678",
+#     "user_type":"companies",
+#     "description":"good good good",
+#     "location":'USA',
+#     "pending":[],
+#     "accepted":[],
+# }
 
 # 插入数据
 # result = DB.students.insert_one(new_data)
@@ -33,3 +33,4 @@ result = DB.companies.insert_one(new_data)
 result2 = DB.users.insert_one(new_data)
 # 打印插入结果
 print("Data inserted with id:", result2.inserted_id)
+
