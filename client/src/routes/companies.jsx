@@ -22,6 +22,63 @@ function MessageCard(props) {
     );
 }
 
+function AcceptedCard(props) {
+    const [message, setMessage] = useState('');
+
+    const handleCease = () => {
+        axios.post("/api/companies/cease", { student_id: props.email})
+            .then(res => {
+                console.log('Contract terminated: ', res.data);
+            })
+            .catch(err => {
+                console.error("Error ceasing: ", err);
+            });
+    };
+
+    const handleSendMessage = () => {
+        axios.post("/api/companies/message", { student_id: props.email, message })
+            .then(res => {
+                if(res.status >= 200 && res.status < 300) {
+                    window.alert('Message sent!');
+                    setMessage('');
+                } else {
+                    window.alert('Message sending failed! Please try again later.');
+                }
+            })
+            .catch(err => {
+                console.error("Error sending message: ", err);
+            });
+    };
+
+    return (
+        <div>
+            <h2> {props.name} </h2>
+            <p>Email: {props.email}</p>
+            <p>Institute: {props.institute}</p>
+            <button onClick={handleCease}>Cease</button>
+            <div>
+                <textarea value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Write your message here..."></textarea>
+                <button onClick={handleSendMessage}>Send Message</button>
+            </div>
+        </div>
+    );
+}
+
+export function CompanyAccepted() {
+    const accepteds = useLoaderData();
+    return (
+        <RequireAuth requiredUserType={'companies'}>
+            <div>
+                {
+                    accepteds.map((accepted) => (
+                        <AcceptedCard key={accepted.google_id} {...accepted} />
+                    ))
+                }
+            </div>
+        </RequireAuth>
+    );
+}
+
 export function CompanyLayout() {
     const auth = useContext(AuthContext);
 
@@ -174,39 +231,3 @@ export async function acceptedLoader() {
     return res.data;
 }
 
-function AcceptedCard(props) {
-    const handleCease = () => {
-        axios.post("/api/companies/cease", { student_id: props.email})
-            .then(res => {
-                console.log('Contract terminated: ', res.data);
-            })
-            .catch(err => {
-                console.error("Error ceasing: ", err);
-            });
-    };
-
-    return (
-        <div>
-            <h2> {props.name} </h2>
-            <p>Email: {props.email}</p>
-            <p>Institute: {props.institute}</p>
-            <button onClick={handleCease}>Cease</button>
-        </div>
-    );
-
-}
-
-export function CompanyAccepted() {
-    const accepteds = useLoaderData();
-    return (
-        <RequireAuth requiredUserType={'companies'}>
-            <div>
-                {
-                    accepteds.map((accepted) => (
-                        <AcceptedCard key={accepted.google_id} {...accepted} />
-                    ))
-                }
-            </div>
-        </RequireAuth>
-    );
-}

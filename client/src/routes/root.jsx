@@ -9,7 +9,7 @@ import {AuthProvider, RequireAuth, AuthContext} from "../auth.jsx";
 import Index from "./index.jsx";
 import {NotFoundPage} from "../error-page.jsx";
 import {
-    StudentLayout, StudentCompanies, StudentInstructors, StudentEdit,
+    StudentLayout, StudentCompanies, StudentInstructors,StudentMessages, StudentEdit,
     // companiesLoader as studentCompaniesLoader,
     // instructorsLoader as studentInstructorsLoader
 } from "./students.jsx";
@@ -96,6 +96,7 @@ export default function Root() {
                                 element={<StudentInstructors/>}
                                 // loader={studentInstructorsLoader}
                             />
+                             <Route path={"messages"} element={<StudentMessages/>} />
                             <Route path={"edit"} element={<StudentEdit/>}/>
                             <Route path={"*"} element={<NotFoundPage/>}/>
                         </Route>

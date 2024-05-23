@@ -91,6 +91,15 @@ function InstructorCard(props) {
     );
 }
 
+function MessageCard(props) {
+    return (
+        <div>
+            <h3>From: {props.companyName} ({props.companyEmail})</h3>
+            <p>{props.message}</p>
+        </div>
+    );
+}
+
 export function StudentLayout() {
     const auth = useContext(AuthContext);
     return (
@@ -106,6 +115,9 @@ export function StudentLayout() {
                             <CustomLink to={"/students/instructors"}>Instructors</CustomLink>
                         </li>
                         <li>
+                            <CustomLink to={"/students/messages"}>Messages</CustomLink>
+                        </li>
+                        <li>
                             <CustomLink to={"/students/edit"}>Edit</CustomLink>
                         </li>
                     </ul>
@@ -116,6 +128,7 @@ export function StudentLayout() {
          </RequireAuth>
     );
 }
+
 
 async function companiesLoader() {
     const res = await axios.get("/api/students/companies");
@@ -168,7 +181,29 @@ export function StudentInstructors() {
          </RequireAuth>
     );
 }
+export function StudentMessages() {
+    const [messages, setMessages] = useState([]);
 
+    useEffect(() => {
+        axios.get("/api/students/messages").then((res) => {
+            setMessages(res.data);
+        });
+    }, []);
+
+    return (
+        <RequireAuth requiredUserType={'students'}>
+            <div>
+                {messages.length > 0 ? (
+                    messages.map((message) => (
+                        <MessageCard key={message._id} {...message} />
+                    ))
+                ) : (
+                    <p>No messages available.</p>
+                )}
+            </div>
+        </RequireAuth>
+    );
+}
 export function StudentEdit() {
     const [selectedFile, setSelectedFile] = useState(null);
     const [institute, setInstitute] = useState('');
