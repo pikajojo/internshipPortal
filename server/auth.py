@@ -17,6 +17,7 @@ def verify_user(username, password):
 
 
 def login_required(function):
+    @wraps(function)
     def wrapper(*args, **kwargs):
         return function() if "email" in session else abort(401)
 
