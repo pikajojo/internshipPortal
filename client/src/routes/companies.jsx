@@ -1,8 +1,9 @@
-import {useState, useContext, useEffect} from "react";
-import {CustomLink} from "../custom.jsx";
-import {Outlet, useLoaderData} from "react-router-dom";
+import { useState, useContext, useEffect } from "react";
+import { CustomLink } from "../custom.jsx";
+import { Outlet, useLoaderData } from "react-router-dom";
 import axios from "axios";
-import {RequireAuth, AuthContext} from "../auth.jsx";
+import { RequireAuth, AuthContext } from "../auth.jsx";
+import MessageForm from "./MessageForm";
 
 function ProfileCard(props) {
     return (
@@ -23,10 +24,8 @@ function MessageCard(props) {
 }
 
 function AcceptedCard(props) {
-    const [message, setMessage] = useState('');
-
     const handleCease = () => {
-        axios.post("/api/companies/cease", { student_id: props.email})
+        axios.post("/api/companies/cease", { student_id: props.email })
             .then(res => {
                 console.log('Contract terminated: ', res.data);
             })
@@ -35,31 +34,13 @@ function AcceptedCard(props) {
             });
     };
 
-    const handleSendMessage = () => {
-        axios.post("/api/companies/message", { student_id: props.email, message })
-            .then(res => {
-                if(res.status >= 200 && res.status < 300) {
-                    window.alert('Message sent!');
-                    setMessage('');
-                } else {
-                    window.alert('Message sending failed! Please try again later.');
-                }
-            })
-            .catch(err => {
-                console.error("Error sending message: ", err);
-            });
-    };
-
     return (
         <div>
-            <h2> {props.name} </h2>
+            <h2>{props.name}</h2>
             <p>Email: {props.email}</p>
             <p>Institute: {props.institute}</p>
             <button onClick={handleCease}>Cease</button>
-            <div>
-                <textarea value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Write your message here..."></textarea>
-                <button onClick={handleSendMessage}>Send Message</button>
-            </div>
+            <MessageForm studentId={props.email} recipientType="student" />
         </div>
     );
 }
@@ -103,7 +84,7 @@ export function CompanyLayout() {
                 <Outlet />
             </div>
         </RequireAuth>
-    )
+    );
 }
 
 export function CompanyMessages() {
@@ -132,22 +113,22 @@ export function CompanyMessages() {
 
 export async function pendingLoader() {
     const res = await axios.get("/api/companies/pending");
-    return res.data
+    return res.data;
 }
 
 function PendingCard(props) {
     const handleAccept = () => {
-        axios.post("/api/companies/accept", { student_id: props.email})
+        axios.post("/api/companies/accept", { student_id: props.email })
             .then(res => {
-            console.log('Candidate accepted: ', res.data);
+                console.log('Candidate accepted: ', res.data);
             })
             .catch(err => {
-            console.error("Error accepting: ", err);
+                console.error("Error accepting: ", err);
             });
     };
 
     const handleReject = () => {
-        axios.post("/api/companies/reject", { student_id: props.email})
+        axios.post("/api/companies/reject", { student_id: props.email })
             .then(res => {
                 console.log('Candidate rejected: ', res.data);
             })
@@ -156,67 +137,69 @@ function PendingCard(props) {
             });
     };
 
-  const handleDownload = () => {
-  axios.post('/api/companies/cv', { file_id: props.cv })
-    .then((res) => {
-      const blob = new Blob([res.data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', props.name + '_cv.pdf');
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    })
-    .catch((error) => {
-      console.error('Error downloading CV:', error);
-    });
-};
+    const handleDownload = () => {
+        axios.post('/api/companies/cv', { file_id: props.cv })
+            .then((res) => {
+                const blob = new Blob([res.data], { type: 'application/pdf' });
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `${props.name}_cv.pdf`);
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode.removeChild(link);
+                window.URL.revokeObjectURL(url);
+            })
+            .catch((error) => {
+                console.error('Error downloading CV:', error);
+            });
+    };
 
     return (
         <div>
-            <h2> {props.name} </h2>
+            <h2>{props.name}</h2>
             <p>Email: {props.email}</p>
             <p>Institute: {props.institute}</p>
             <button onClick={handleAccept}>Accept</button>
             <button onClick={handleReject}>Reject</button>
             <button onClick={handleDownload}>Download CV</button>
+            <MessageForm recipientId={props.email} recipientType="student" />
         </div>
     );
 }
 
 export function CompanyPending() {
-  const [pendings, setPendings] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+    const [pendings, setPendings] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios.get('/api/companies/pending');
-        setPendings(res.data);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await axios.get('/api/companies/pending');
+                setPendings(res.data);
+            } catch (err) {
+                setError(err);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-   fetchData();
-  }, []);
+        fetchData();
+    }, []);
 
-  if (loading) {
-    return <div>loading...</div>;
-  }
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
+    if (error) {
+        return <div>Error: {error.message}</div>;
+    }
+
     return (
         <RequireAuth requiredUserType={'companies'}>
             <div>
-            {
+                {
                     pendings.map((pending) => (
                         <PendingCard key={pending.email} {...pending} />
                     ))
@@ -230,4 +213,3 @@ export async function acceptedLoader() {
     const res = await axios.get("/api/companies/accepted");
     return res.data;
 }
-

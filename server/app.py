@@ -58,6 +58,8 @@ def register():
         if user_type == 'students':
             DB.students.insert_one(data)
         elif user_type == 'companies':
+            data['pending'] = []
+            data['accepted'] = []
             DB.companies.insert_one(data)
         elif user_type == 'instructors':
             DB.instructors.insert_one(data)
@@ -160,14 +162,23 @@ def students_apply():
     company_id = request.json.get('company_id')
     company_query = {'email': company_id}
     company_info = DB.companies.find_one(company_query)
-    if ((company_info is None)
-            or (student_id in company_info['pending'])
-            or (student_id in company_info['accepted'])):
-        abort(400)
+
+    if company_info is None:
+        return jsonify({'error': 'Invalid company data'}), 400
+    if 'pending' not in company_info:
+        company_info['pending'] = []
+        DB.companies.update_one(company_query, {"$set": {'pending': company_info['pending']}})
+    if 'accepted' not in company_info:
+        company_info['accepted'] = []
+        DB.companies.update_one(company_query, {"$set": {'accepted': company_info['accepted']}})
+
+    if (student_id in company_info['pending']) or (student_id in company_info['accepted']):
+        return jsonify({'error': 'Already applied'}), 400
+
     DB.students.update_one(student_query, {"$addToSet": {'pending': company_id}})
     DB.companies.update_one(company_query, {"$addToSet": {'pending': student_id}})
 
-    return "Succeed", 200
+    return jsonify({'success': 'Application successful'}), 200
 
 
 @app.get('/api/companies/pending')
@@ -277,15 +288,17 @@ def instructors_students():
 def students_send_message():
     student_id = session.get('email')
     company_id = request.json.get('company_id')
-    message = request.json.get('message')
+    message = request.json.get('message').strip()
     student_info = DB.students.find_one({'email': student_id})
 
     if not student_info or not company_id or not message:
         return jsonify({'error': 'Invalid input'}), 400
 
+    if not message:  # Check if the message is empty after trimming
+        return jsonify({'error': 'Message cannot be empty'}), 400
+
     message_data = {
         'student_email': student_id,
-        'student_name': student_info['name'],
         'company_email': company_id,
         'message': message
     }
@@ -338,6 +351,7 @@ def students_get_messages():
     student_id = session.get('email')
     messages = list(DB.messages.find({'student_email': student_id}))
     return jsonify(messages), 200
+
 
 if __name__ == '__main__':
     app.run()

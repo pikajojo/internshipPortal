@@ -3,7 +3,7 @@ import {CustomLink} from "../custom.jsx";
 import {Outlet, useLoaderData} from "react-router-dom";
 import axios from "axios";
 import { AuthContext, RequireAuth } from "../auth.jsx";
-
+import MessageForm from "./MessageForm";
 function ProfileCard(props) {
     return (
         <div>
@@ -19,31 +19,18 @@ function ProfileCard(props) {
 
 function CompanyCard(props) {
     const [showDetail, setShowDetail] = useState(false);
-    const [message, setMessage] = useState('');
     const toggleDetail = () => {
         setShowDetail(!showDetail)
     };
 
     const handleApply = () => {
-        axios.post("/api/students/apply", {"company_id": props.email})
+        axios.post("/api/students/apply", { "company_id": props.email })
             .then((res) => {
-                if(res.status >= 200 && res.status < 300) {
+                if (res.status >= 200 && res.status < 300) {
                     window.alert('Submitted!');
                 } else {
                     window.alert('Application failed! Please try again later and ' +
                         'double-check that your resume has been uploaded correctly.');
-                }
-            })
-    };
-
-    const handleSendMessage = () => {
-        axios.post("/api/students/message", {"company_id": props.email, "message": message})
-            .then((res) => {
-                if(res.status >= 200 && res.status < 300) {
-                    window.alert('Message sent!');
-                    setMessage('');
-                } else {
-                    window.alert('Message sending failed! Please try again later.');
                 }
             })
     };
@@ -55,28 +42,25 @@ function CompanyCard(props) {
             <ul>
                 <li>Location: {props.location}</li>
                 <li>Website: {props.website}</li>
-                {
-                    showDetail &&
+                {showDetail && (
                     <>
                         <li>Email: {props.email}</li>
                         <li>Tel: {props.phone}</li>
                         <li>Description: {props.description}</li>
                     </>
-                }
+                )}
             </ul>
             <button onClick={toggleDetail}>
                 {showDetail ? 'Hide detail' : 'Show detail'}
             </button>
             <button onClick={handleApply} disabled={props.state !== 'none'}>
-                {props.state === 'none' ? "Apply": props.state === 'accepted' ? "Accepted" : "Pending"}
+                {props.state === 'none' ? "Apply" : props.state === 'accepted' ? "Accepted" : "Pending"}
             </button>
-            <div>
-                <textarea value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Write your message here..."></textarea>
-                <button onClick={handleSendMessage}>Send Message</button>
-            </div>
+            <MessageForm recipientId={props.email} recipientType="company" />
         </div>
     );
 }
+
 
 function InstructorCard(props) {
     return (
@@ -94,7 +78,7 @@ function InstructorCard(props) {
 function MessageCard(props) {
     return (
         <div>
-            <h3>From: {props.companyName} ({props.companyEmail})</h3>
+            <h3>From: {props.name} ({props.email})</h3>
             <p>{props.message}</p>
         </div>
     );
