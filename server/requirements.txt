@@ -1,0 +1,7 @@
+flask
+flask-session
+python-dotenv
+pymongo[srv]
+google-auth-oauthlib
+google-auth
+werkzeug
