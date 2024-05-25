@@ -4,7 +4,7 @@ import tempfile
 
 import werkzeug
 from dotenv import load_dotenv
-from flask import Flask, Response, request, jsonify, session, abort, redirect, make_response
+from flask import Flask, Response, request, jsonify, session, abort, redirect, make_response, send_file
 from flask import Flask, request, send_file, jsonify
 import io
 from flask_session import Session
@@ -197,34 +197,14 @@ def companies_accepted():
     return jsonify(accepted), 200
 
 
-# @app.post('/api/companies/cv')
-# @user_required(user_type='companies')
-# def companies_cv():
-#     file = db_utils.load_file(request.json.get('file_id'))
-#     return Response(file, content_type='application/pdf')
-
-@app.route('/api/companies/cv', methods=['POST'])
+@app.post('/api/companies/cv')
+@user_required(user_type='companies')
 def companies_cv():
-    try:
-        data = request.json
-        file_id = data.get('file_id')
-        if not file_id:
-            return jsonify({'error': 'file_id is required'}), 400
-
-        # 使用 load_file 函数从文件系统中加载文件
-        file_data = db_utils.load_file(file_id)
-        if file_data is None:
-            return jsonify({'error': 'File not found'}), 404
-
-        return send_file(
-            io.BytesIO(file_data.read()),
-            mimetype='application/pdf',
-            as_attachment=True,
-            download_name='cv.pdf'
-        )
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
+    file, filename = db_utils.load_file(request.json.get('file_id'))
+    return send_file(file,
+                     as_attachment=True,
+                     mimetype='application/pdf',
+                     download_name=filename)
 
 @app.post('/api/companies/accept')
 @user_required(user_type='companies')
@@ -276,12 +256,51 @@ def companies_cease():
 
     return jsonify({}), 200
 
-
-@app.get('/api/instructors/students')
+@app.get('/api/instructors/toreview')
 @user_required(user_type='instructors')
-def instructors_students():
-    pass
+def instructors_to_review():
+    instructor_id = session.get('email')
+    to_review_students = db_utils.load_to_review_students_for_instructor(instructor_id)
+    return jsonify(to_review_students), 200
+@app.get('/api/instructors/reviewed')
+@user_required(user_type='instructors')
+def instructors_reviewed():
+    instructor_id = session.get('email')
+    reviewed_students = db_utils.load_reviewed_students_for_instructor(instructor_id)
+    return jsonify(reviewed_students), 200
 
+@app.post('/api/instructors/message')
+@user_required(user_type='instructors')
+def instructors_send_message():
+    data = request.json
+    student_id = data.get('student_id')
+    message = data.get('message')
+
+    if not student_id or not message:
+        return jsonify({'error': 'student_id and message are required'}), 400
+
+    result = db_utils.send_message_to_student(session['email'], student_id, message)
+
+    if result:
+        return jsonify({'message': 'Message sent successfully'}), 200
+    else:
+        return jsonify({'error': 'Failed to send message'}), 500
+
+@app.post('/api/instructors/review')
+@user_required(user_type='instructors')
+def instructors_review():
+    data = request.json
+    student_id = data.get('student_id')
+
+    if not student_id:
+        return jsonify({'error': 'student_id is required'}), 400
+
+    result = db_utils.review_student(session['email'], student_id)
+
+    if result:
+        return jsonify({'message': 'Student reviewed successfully'}), 200
+    else:
+        return jsonify({'error': 'Failed to review student'}), 500
 
 @app.post('/api/students/message')
 @user_required(user_type='students')

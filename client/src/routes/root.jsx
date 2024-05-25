@@ -18,7 +18,11 @@ import {
     // pendingLoader as companyPendingLoader,
     // acceptedLoader as companyAcceptedLoader
 } from "./companies.jsx";
-
+import {
+    InstructorLayout, InstructorToReview, InstructorReviewed, reviewedLoader, toReviewLoader
+    // reviewedLoader as instructorReviewedLoader,
+    // toReviewLoader as instructortoReviewLoader
+} from "./instructors.jsx";
 import Login from './Login.jsx';   // 引入登录组件
 import Register from './Register.jsx'; // 引入注册组件
 
@@ -114,10 +118,15 @@ export default function Root() {
                             <Route path={"messages"} element={<CompanyMessages/>} />
                             <Route path={"*"} element={<NotFoundPage/>}/>
                         </Route>
-                        {/*<Route path={"instructors"} element={<InstructorLayout/>}>*/}
-                        {/*    <Route index element={<InstructorStudents/>}/>*/}
-                        {/*    <Route path={"*"} element={<Ops/>}/>*/}
-                        {/*</Route>*/}
+                        <Route path={"instructors"} element={<InstructorLayout/>}>
+                                <Route index element={<InstructorToReview/>}
+                                    // loader={toReviewLoader}
+                                    />
+                                <Route path="reviewed" element={<InstructorReviewed/>}
+                                    // loader={ReviewedLoader}
+                                />
+                                <Route path={"*"} element={<NotFoundPage/>}/>
+                            </Route>
                 </Routes>
 
        </>
