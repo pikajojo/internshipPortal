@@ -58,6 +58,8 @@ def register():
         if user_type == 'students':
             DB.students.insert_one(data)
         elif user_type == 'companies':
+            data['pending'] = []
+            data['accepted'] = []
             DB.companies.insert_one(data)
         elif user_type == 'instructors':
             DB.instructors.insert_one(data)
@@ -160,14 +162,23 @@ def students_apply():
     company_id = request.json.get('company_id')
     company_query = {'email': company_id}
     company_info = DB.companies.find_one(company_query)
-    if ((company_info is None)
-            or (student_id in company_info['pending'])
-            or (student_id in company_info['accepted'])):
-        abort(400)
+
+    if company_info is None:
+        return jsonify({'error': 'Invalid company data'}), 400
+    if 'pending' not in company_info:
+        company_info['pending'] = []
+        DB.companies.update_one(company_query, {"$set": {'pending': company_info['pending']}})
+    if 'accepted' not in company_info:
+        company_info['accepted'] = []
+        DB.companies.update_one(company_query, {"$set": {'accepted': company_info['accepted']}})
+
+    if (student_id in company_info['pending']) or (student_id in company_info['accepted']):
+        return jsonify({'error': 'Already applied'}), 400
+
     DB.students.update_one(student_query, {"$addToSet": {'pending': company_id}})
     DB.companies.update_one(company_query, {"$addToSet": {'pending': student_id}})
 
-    return "Succeed", 200
+    return jsonify({'success': 'Application successful'}), 200
 
 
 @app.get('/api/companies/pending')
@@ -195,28 +206,14 @@ def companies_cv():
                      mimetype='application/pdf',
                      download_name=filename)
 
-# @app.route('/api/companies/cv', methods=['POST'])
-# def companies_cv():
-#     try:
-#         data = request.json
-#         file_id = data.get('file_id')
-#         if not file_id:
-#             return jsonify({'error': 'file_id is required'}), 400
-#
-#         # 使用 load_file 函数从文件系统中加载文件
-#         file_data = db_utils.load_file(file_id)
-#         if file_data is None:
-#             return jsonify({'error': 'File not found'}), 404
-#
-#         return send_file(
-#             io.BytesIO(file_data.read()),
-#             mimetype='application/pdf',
-#             as_attachment=True,
-#             download_name='cv.pdf'
-#         )
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 500
-
+@app.post('/api/instructors/cv')
+@user_required(user_type='instructors')
+def instructors_cv():
+    file, filename = db_utils.load_file(request.json.get('file_id'))
+    return send_file(file,
+                     as_attachment=True,
+                     mimetype='application/pdf',
+                     download_name=filename)
 
 @app.post('/api/companies/accept')
 @user_required(user_type='companies')
@@ -313,6 +310,76 @@ def instructors_review():
         return jsonify({'message': 'Student reviewed successfully'}), 200
     else:
         return jsonify({'error': 'Failed to review student'}), 500
+
+@app.post('/api/students/message')
+@user_required(user_type='students')
+def students_send_message():
+    student_id = session.get('email')
+    company_id = request.json.get('company_id')
+    message = request.json.get('message').strip()
+    student_info = DB.students.find_one({'email': student_id})
+
+    if not student_info or not company_id or not message:
+        return jsonify({'error': 'Invalid input'}), 400
+
+    if not message:  # Check if the message is empty after trimming
+        return jsonify({'error': 'Message cannot be empty'}), 400
+
+    message_data = {
+        'student_email': student_id,
+        'company_email': company_id,
+        'message': message
+    }
+
+    result = DB.messages.insert_one(message_data)
+
+    if result.inserted_id:
+        return jsonify({'success': True}), 200
+    else:
+        return jsonify({'error': 'Failed to send message'}), 500
+
+
+@app.get('/api/companies/messages')
+@user_required(user_type='companies')
+def companies_get_messages():
+    company_id = session.get('email')
+    messages = list(DB.messages.find({'company_email': company_id}))
+    return jsonify(messages), 200
+
+
+@app.post('/api/companies/message')
+@user_required(user_type='companies')
+def companies_send_message():
+    company_id = session.get('email')
+    student_id = request.json.get('student_id')
+    message = request.json.get('message')
+    company_info = DB.companies.find_one({'email': company_id})
+
+    if not company_info or not student_id or not message:
+        return jsonify({'error': 'Invalid input'}), 400
+
+    message_data = {
+        'company_email': company_id,
+        'company_name': company_info['name'],
+        'student_email': student_id,
+        'message': message
+    }
+
+    result = DB.messages.insert_one(message_data)
+
+    if result.inserted_id:
+        return jsonify({'success': True}), 200
+    else:
+        return jsonify({'error': 'Failed to send message'}), 500
+
+
+@app.get('/api/students/messages')
+@user_required(user_type='students')
+def students_get_messages():
+    student_id = session.get('email')
+    messages = list(DB.messages.find({'student_email': student_id}))
+    return jsonify(messages), 200
+
 
 if __name__ == '__main__':
     app.run()

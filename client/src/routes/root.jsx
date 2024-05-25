@@ -9,16 +9,20 @@ import {AuthProvider, RequireAuth, AuthContext} from "../auth.jsx";
 import Index from "./index.jsx";
 import {NotFoundPage} from "../error-page.jsx";
 import {
-    StudentLayout, StudentCompanies, StudentInstructors, StudentEdit,
+    StudentLayout, StudentCompanies, StudentInstructors,StudentMessages, StudentEdit,
     // companiesLoader as studentCompaniesLoader,
     // instructorsLoader as studentInstructorsLoader
 } from "./students.jsx";
 import {
-    CompanyLayout, CompanyPending, CompanyAccepted, pendingLoader,
+    CompanyLayout, CompanyPending, CompanyAccepted, CompanyMessages, pendingLoader,
     // pendingLoader as companyPendingLoader,
     // acceptedLoader as companyAcceptedLoader
 } from "./companies.jsx";
-
+import {
+    InstructorLayout, InstructorToReview, InstructorReviewed, reviewedLoader, toReviewLoader
+    // reviewedLoader as instructorReviewedLoader,
+    // toReviewLoader as instructortoReviewLoader
+} from "./instructors.jsx";
 import Login from './Login.jsx';   // 引入登录组件
 import Register from './Register.jsx';
 import {InstructorLayout, InstructorReviewed, InstructorToReview} from "./instructors.jsx"; // 引入注册组件
@@ -97,6 +101,7 @@ export default function Root() {
                                 element={<StudentInstructors/>}
                                 // loader={studentInstructorsLoader}
                             />
+                             <Route path={"messages"} element={<StudentMessages/>} />
                             <Route path={"edit"} element={<StudentEdit/>}/>
                             <Route path={"*"} element={<NotFoundPage/>}/>
                         </Route>
@@ -111,6 +116,7 @@ export default function Root() {
                                 element={<CompanyAccepted/>}
                                 // loader={companyAcceptedLoader}
                             />
+                            <Route path={"messages"} element={<CompanyMessages/>} />
                             <Route path={"*"} element={<NotFoundPage/>}/>
                         </Route>
                         <Route path={"instructors"} element={<InstructorLayout/>}>

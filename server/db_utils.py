@@ -121,3 +121,62 @@ def load_students_for_company(company_id, state):
     # if state not in company_info:
     #     return None
     return list(map(mapper, company_info[state]))
+
+
+def add_message(student_email, company_email, message):
+    DB.messages.insert_one({
+        'student_email': student_email,
+        'company_email': company_email,
+        'message': message
+    })
+
+
+def get_messages_for_company(company_email):
+    try:
+        messages = list(DB.messages.find({'company_email': company_email}))
+        for message in messages:
+            message['_id'] = str(message['_id'])
+        return messages
+    except Exception as e:
+        print("Failed to fetch messages:", e)
+        return []
+
+
+def load_to_review_students_for_instructor(instructor_id):
+    instructor = DB['instructors'].find_one({'email': instructor_id})
+    if instructor:
+        to_review_students = list(DB['students'].find({'email': {'$in': instructor.get('pending', [])}}))
+        return to_review_students
+    return []
+
+def load_reviewed_students_for_instructor(instructor_id):
+    instructor = DB['instructors'].find_one({'email': instructor_id})
+    if instructor:
+        reviewed_students = list(DB['students'].find({'email': {'$in': instructor.get('reviewed', [])}}))
+        return reviewed_students
+    return []
+
+def send_message_to_student(instructor_id, student_id, message):
+    try:
+        DB['messages'].insert_one({
+            'instructor_id': instructor_id,
+            'student_id': student_id,
+            'message': message,
+            'timestamp': datetime.datetime.utcnow()
+        })
+        return True
+    except Exception as e:
+        print(f"Error sending message: {e}")
+        return False
+
+def review_student(instructor_id, student_id):
+    try:
+        # Update the instructor's reviewed list
+        DB['instructors'].update_one(
+            {'email': instructor_id},
+            {'$addToSet': {'reviewed': student_id}, '$pull': {'pending': student_id}}
+        )
+        return True
+    except Exception as e:
+        print(f"Error reviewing student: {e}")
+        return False
