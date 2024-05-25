@@ -342,9 +342,22 @@ def students_send_message():
 @app.get('/api/companies/messages')
 @user_required(user_type='companies')
 def companies_get_messages():
-    company_id = session.get('email')
-    messages = list(DB.messages.find({'company_email': company_id}))
-    return jsonify(messages), 200
+    try:
+        company_id = session.get('email')
+        if not company_id:
+            return jsonify({"error": "Unauthorized"}), 401
+
+        messages_cursor = DB.messages.find({'company_email': company_id})
+        messages = list(messages_cursor)
+
+        # 确保每个消息都是一个标准的 Python 字典
+        messages = [message for message in messages]
+
+        # app.logger.debug(f"Fetched messages for company {company_id}: {messages}")
+        return jsonify(messages), 200
+    except Exception as e:
+        # app.logger.error(f"Error fetching messages: {e}", exc_info=True)
+        return jsonify({"error": "Internal Server Error"}), 500
 
 
 @app.post('/api/companies/message')
