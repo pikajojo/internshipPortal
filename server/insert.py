@@ -17,13 +17,13 @@ from server.config import DB
 # }
 
 new_data = {
-    "name": "whatever",
-    "email": "whatever@gmail.com",
+    "name": "Disney",
+    "email": "disneyinfo@gmail.com",
     "password": "12345678",
     "user_type":"companies",
     "description":"good good good",
     "location":'USA',
-    "pending":["alice@vub.be"],
+    "pending":["alice@vub.be","aaa@vub.be","wangshifu@vub.be"],
     "accepted":["ziz@gmail.com"],
 }
 
