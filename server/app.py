@@ -195,29 +195,6 @@ def companies_cv():
                      mimetype='application/pdf',
                      download_name=filename)
 
-@app.route('/api/companies/cv', methods=['POST'])
-def companies_cv():
-    try:
-        data = request.json
-        file_id = data.get('file_id')
-        if not file_id:
-            return jsonify({'error': 'file_id is required'}), 400
-
-        # 使用 load_file 函数从文件系统中加载文件
-        file_data = db_utils.load_file(file_id)
-        if file_data is None:
-            return jsonify({'error': 'File not found'}), 404
-
-        return send_file(
-            io.BytesIO(file_data.read()),
-            mimetype='application/pdf',
-            as_attachment=True,
-            download_name='cv.pdf'
-        )
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-
 @app.post('/api/companies/accept')
 @user_required(user_type='companies')
 def companies_accept():

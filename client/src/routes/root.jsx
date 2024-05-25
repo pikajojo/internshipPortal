@@ -18,7 +18,11 @@ import {
     // pendingLoader as companyPendingLoader,
     // acceptedLoader as companyAcceptedLoader
 } from "./companies.jsx";
-
+import {
+    InstructorLayout, InstructorToReview, InstructorReviewed, reviewedLoader, toReviewLoader
+    // reviewedLoader as instructorReviewedLoader,
+    // toReviewLoader as instructortoReviewLoader
+} from "./instructors.jsx";
 import Login from './Login.jsx';   // 引入登录组件
 import Register from './Register.jsx'; // 引入注册组件
 
