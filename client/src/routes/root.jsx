@@ -20,7 +20,8 @@ import {
 } from "./companies.jsx";
 
 import Login from './Login.jsx';   // 引入登录组件
-import Register from './Register.jsx'; // 引入注册组件
+import Register from './Register.jsx';
+import {InstructorLayout, InstructorReviewed, InstructorToReview} from "./instructors.jsx"; // 引入注册组件
 
 
 
