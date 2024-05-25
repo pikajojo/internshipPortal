@@ -3,7 +3,8 @@ import { CustomLink } from "../custom.jsx";
 import { Outlet } from "react-router-dom";
 import axios from "axios";
 import { AuthContext, RequireAuth } from "../auth.jsx";
-import { InboxCard } from "./InboxCard.jsx";
+import InboxCard from "./InboxCard.jsx";
+// import { InboxCard } from "./InboxCard.jsx";
 
 function ProfileCard(props) {
     return (
