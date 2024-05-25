@@ -126,4 +126,11 @@ def add_message(student_email, company_email, message):
 
 
 def get_messages_for_company(company_email):
-    return list(DB.messages.find({'company_email': company_email}))
+    try:
+        messages = list(DB.messages.find({'company_email': company_email}))
+        for message in messages:
+            message['_id'] = str(message['_id'])
+        return messages
+    except Exception as e:
+        print("Failed to fetch messages:", e)
+        return []
