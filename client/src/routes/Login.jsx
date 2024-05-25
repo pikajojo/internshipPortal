@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../login.css';
-//import { handleLogin } from './root.jsx'; // 假设 handleLogin 在 auth.js 文件中定义
 
 import { AuthContext } from '../auth';
-import axios from "axios"; // 导入你的 AuthContext
+import axios from "axios";
 
 
 function Login() {
@@ -25,14 +24,14 @@ function Login() {
   };
 
  const handleSubmit = async (e) => {
-    e.preventDefault(); // 阻止表单默认提交行为
+    e.preventDefault();
     try {
         const response = await fetch('/api/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(credentials) // 确保 credentials 在作用域内
+            body: JSON.stringify(credentials)
         });
         console.log('Response status:', response.status);
         console.log('Response status text:', response.statusText);
@@ -58,7 +57,7 @@ function Login() {
               // navigate(res.data.user_type, {replace: true});
         })
         }else {
-            // 可以在这里处理登录失败的逻辑，例如显示错误消息
+            //deal with login failing
             console.error('Login failed:', res.message);
         }
     } catch (error) {
