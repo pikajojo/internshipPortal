@@ -114,4 +114,6 @@ def load_students_for_company(company_id, state):
     company_info = DB.companies.find_one({'email': company_id})
     if company_info is None:
         return None
+    # if state not in company_info:
+    #     return None
     return list(map(mapper, company_info[state]))

@@ -17,14 +17,14 @@ from server.config import DB
 # }
 
 new_data = {
-    "name": "apple",
-    "email": "appleinfo@gmail.com",
+    "name": "whatever",
+    "email": "whatever@gmail.com",
     "password": "12345678",
     "user_type":"companies",
     "description":"good good good",
     "location":'USA',
-    "pending":[],
-    "accepted":[],
+    "pending":["alice@vub.be"],
+    "accepted":["ziz@gmail.com"],
 }
 
 # 插入数据
