@@ -318,16 +318,16 @@ def students_send_message():
     student_id = session.get('email')
     company_id = request.json.get('company_id')
     message = request.json.get('message').strip()
-    student_info = DB.students.find_one({'email': student_id})
+    # student_info = DB.students.find_one({'email': student_id})
 
-    if not student_info or not company_id or not message:
+    if not company_id or not message:
         return jsonify({'error': 'Invalid input'}), 400
 
-    if not message:  # Check if the message is empty after trimming
+    if not message:
         return jsonify({'error': 'Message cannot be empty'}), 400
 
     message_data = {
-        'student_email': student_id,
+        'student_id': student_id,
         'company_email': company_id,
         'message': message
     }
@@ -349,15 +349,10 @@ def companies_get_messages():
             return jsonify({"error": "Unauthorized"}), 401
 
         messages_cursor = DB.messages.find({'company_email': company_id})
-        # messages = list(messages_cursor)
-
-        # 确保每个消息都是一个标准的 Python 字典
-        messages = [message for message in messages_cursor]
-
-        # app.logger.debug(f"Fetched messages for company {company_id}: {messages}")
+        messages = [{message.get('student_Id'), message.get('message')} for message in messages_cursor]
         return json_util.dumps(messages), 200
     except Exception as e:
-        # app.logger.error(f"Error fetching messages: {e}", exc_info=True)
+        # Optionally, you could log the error here if logging is set up
         return jsonify({"error": "Internal Server Error"}), 500
 
 

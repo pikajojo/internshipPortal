@@ -2,6 +2,7 @@ from config import DB, FS
 from werkzeug.utils import secure_filename
 from bson import ObjectId
 from io import BytesIO
+import nanoid
 
 def load_all_companies(n=None):
     return list(DB['companies'].find())
@@ -124,7 +125,9 @@ def load_students_for_company(company_id, state):
 
 
 def add_message(student_email, company_email, message):
+    message_id = nanoid.nanoid()  # Generate a unique ID using nanoid
     DB.messages.insert_one({
+        '_id': message_id,  # Store the nanoid as the _id field
         'student_email': student_email,
         'company_email': company_email,
         'message': message

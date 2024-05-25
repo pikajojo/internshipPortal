@@ -17,7 +17,7 @@ function ProfileCard(props) {
 function MessageCard(props) {
     return (
         <div>
-            <h3>From: {props.studentName} ({props.studentEmail})</h3>
+            <h3>From: Student ID {props.studentId} </h3>
             <p>{props.message}</p>
         </div>
     );
@@ -38,7 +38,7 @@ function AcceptedCard(props) {
         <div>
             <h2>{props.name}</h2>
             <p>Email: {props.email}</p>
-            <p>Institute: {props.institute}</p>
+            <p>Institute: {props.major}</p>
             <button onClick={handleCease}>Cease</button>
             <MessageForm studentId={props.email} recipientType="student" />
         </div>
@@ -92,6 +92,7 @@ export function CompanyMessages() {
 
     useEffect(() => {
         axios.get("/api/companies/messages").then((res) => {
+            console.log("Received messages:", res.data);
             setMessages(res.data);
         });
     }, []);
@@ -101,7 +102,7 @@ export function CompanyMessages() {
             <div>
                 {messages.length > 0 ? (
                     messages.map((message) => (
-                        <MessageCard key={message._id} {...message} />
+                        <MessageCard key={message._id} studentId={message.student_id} message={message.message} />
                     ))
                 ) : (
                     <p>No messages available.</p>
