@@ -3,6 +3,7 @@ import requests
 import tempfile
 
 import werkzeug
+from bson import json_util
 from dotenv import load_dotenv
 from flask import Flask, Response, request, jsonify, session, abort, redirect, make_response, send_file
 from flask import Flask, request, send_file, jsonify
@@ -348,13 +349,13 @@ def companies_get_messages():
             return jsonify({"error": "Unauthorized"}), 401
 
         messages_cursor = DB.messages.find({'company_email': company_id})
-        messages = list(messages_cursor)
+        # messages = list(messages_cursor)
 
         # 确保每个消息都是一个标准的 Python 字典
-        messages = [message for message in messages]
+        messages = [message for message in messages_cursor]
 
         # app.logger.debug(f"Fetched messages for company {company_id}: {messages}")
-        return jsonify(messages), 200
+        return json_util.dumps(messages), 200
     except Exception as e:
         # app.logger.error(f"Error fetching messages: {e}", exc_info=True)
         return jsonify({"error": "Internal Server Error"}), 500
@@ -389,9 +390,25 @@ def companies_send_message():
 @app.get('/api/students/messages')
 @user_required(user_type='students')
 def students_get_messages():
-    student_id = session.get('email')
-    messages = list(DB.messages.find({'student_email': student_id}))
-    return jsonify(messages), 200
+    try:
+        student_id = session.get('email')
+        if not student_id:
+            return jsonify({"error": "Unauthorized"}), 401
+
+        # 从数据库中查询消息，假设 DB 是您的数据库连接对象
+        messages_cursor = DB.messages.find({'student_email': student_id})
+
+        # 将游标转换为列表，并确保每个消息都是一个标准的 Python 字典
+        messages = [message for message in messages_cursor]
+
+        # 日志记录查询到的消息，用于调试
+        # app.logger.debug(f"Fetched messages for student {student_id}: {messages}")
+
+        # 返回 JSON 响应
+        return json_util.dumps(messages), 200
+    except Exception as e:
+        # app.logger.error(f"Error fetching messages: {e}", exc_info=True)
+        return jsonify({"error": "Internal Server Error"}), 500
 
 
 if __name__ == '__main__':
