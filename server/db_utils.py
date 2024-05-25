@@ -1,6 +1,7 @@
 from config import DB, FS
 from werkzeug.utils import secure_filename
-
+from bson import ObjectId
+from io import BytesIO
 
 def load_all_companies(n=None):
     return list(DB['companies'].find())
@@ -99,7 +100,10 @@ def update_major(student_id, major_name):
 
 
 def load_file(file_id):
-    return FS.get(file_id)
+    grid_file = FS.get(ObjectId(file_id))
+    bio = BytesIO(grid_file.read())
+    bio.seek(0)
+    return bio, grid_file.filename
 
 
 def load_students_for_company(company_id, state):

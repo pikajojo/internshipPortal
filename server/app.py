@@ -4,7 +4,7 @@ import tempfile
 
 import werkzeug
 from dotenv import load_dotenv
-from flask import Flask, Response, request, jsonify, session, abort, redirect, make_response
+from flask import Flask, Response, request, jsonify, session, abort, redirect, make_response, send_file
 from flask import Flask, request, send_file, jsonify
 import io
 from flask_session import Session
@@ -186,11 +186,14 @@ def companies_accepted():
     return jsonify(accepted), 200
 
 
-# @app.post('/api/companies/cv')
-# @user_required(user_type='companies')
-# def companies_cv():
-#     file = db_utils.load_file(request.json.get('file_id'))
-#     return Response(file, content_type='application/pdf')
+@app.post('/api/companies/cv')
+@user_required(user_type='companies')
+def companies_cv():
+    file, filename = db_utils.load_file(request.json.get('file_id'))
+    return send_file(file,
+                     as_attachment=True,
+                     mimetype='application/pdf',
+                     download_name=filename)
 
 @app.route('/api/companies/cv', methods=['POST'])
 def companies_cv():
