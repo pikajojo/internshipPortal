@@ -68,7 +68,7 @@ function ToReviewCard(props) {
     };
 
     const handleDownload = () => {
-        axios.post('/api/instructors/cv', { file_id: props.cv })
+        axios.post('/api/companies/cv', { file_id: props.cv })
             .then((res) => {
                 const blob = new Blob([res.data], { type: 'application/pdf' });
                 const url = window.URL.createObjectURL(blob);
