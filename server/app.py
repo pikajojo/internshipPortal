@@ -206,6 +206,15 @@ def companies_cv():
                      mimetype='application/pdf',
                      download_name=filename)
 
+@app.post('/api/instructors/cv')
+@user_required(user_type='instructors')
+def instructors_cv():
+    file, filename = db_utils.load_file(request.json.get('file_id'))
+    return send_file(file,
+                     as_attachment=True,
+                     mimetype='application/pdf',
+                     download_name=filename)
+
 @app.post('/api/companies/accept')
 @user_required(user_type='companies')
 def companies_accept():
