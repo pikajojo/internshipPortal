@@ -4,6 +4,7 @@ from config import DB, FS
 from werkzeug.utils import secure_filename
 from bson import ObjectId
 from io import BytesIO
+from datetime import datetime
 
 def load_all_companies(n=None):
     return list(DB['companies'].find())
@@ -42,7 +43,7 @@ def load_companies_for_student(student_id):
 
         return res
 
-    all_companies = list(DB['companies'].find())  # 获取所有公司
+    all_companies = list(DB['companies'].find())
     return list(map(mapper, all_companies))
 
 
@@ -50,9 +51,20 @@ def load_instructors_for_student(student_id):
     student = DB['students'].find_one({'email': student_id})
 
     def mapper(instructor):
-        keep = ['name', 'email', 'institute',
-                'avatar']
-        return {k: instructor.get(k, None) for k in keep}
+        keep = ['name', 'email', 'institute', 'major']
+        res = {k: instructor.get(k, None) for k in keep}
+        res['state'] = 'none'
+
+        if res['email'] in student.get('pending', []):
+            res['state'] = 'pending'
+        elif res['email'] in student.get('reviewed', []):
+            res['state'] = 'reviewed'
+
+        return res
+
+    all_instructors = list(DB['instructors'].find({'email': {'$ne': student_id}}))
+    mapped_instructors = list(map(mapper, all_instructors))
+    return mapped_instructors
 
 
 def load_user_raw_info(user_type, user_id):
@@ -143,20 +155,23 @@ def get_messages_for_company(company_email):
         print("Failed to fetch messages:", e)
         return []
 
+def load_students_for_instructor(instructor_id, state):
+    # Mapper function to transform student data
+    def mapper(student_id):
+        student_info = DB['students'].find_one({'email': student_id})
+        if student_info is None:
+            return None
+        keep = ['name', 'email', 'institute', 'cv', 'avatar']
+        return {k: student_info.get(k, None) for k in keep}
 
-def load_to_review_students_for_instructor(instructor_id):
-    instructor = DB['instructors'].find_one({'email': instructor_id})
-    if instructor:
-        to_review_students = list(DB['students'].find({'email': {'$in': instructor.get('pending', [])}}))
-        return to_review_students
-    return []
+    instructor_info = DB['instructors'].find_one({'email': instructor_id})
+    if instructor_info is None:
+        return None
 
-def load_reviewed_students_for_instructor(instructor_id):
-    instructor = DB['instructors'].find_one({'email': instructor_id})
-    if instructor:
-        reviewed_students = list(DB['students'].find({'email': {'$in': instructor.get('reviewed', [])}}))
-        return reviewed_students
-    return []
+    if state not in instructor_info:
+        return None
+    students = list(map(mapper, instructor_info[state]))
+    return [student for student in students if student is not None]
 
 def send_message_to_student(instructor_id, student_id, message):
     try:

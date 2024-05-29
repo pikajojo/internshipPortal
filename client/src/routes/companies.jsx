@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { CustomLink } from "../custom.jsx";
 import { Outlet, useLoaderData } from "react-router-dom";
 import axios from "axios";
@@ -46,19 +46,44 @@ function AcceptedCard(props) {
 }
 
 export function CompanyAccepted() {
-    const accepteds = useLoaderData();
+    const [accepteds, setAccpeteds] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await axios.get('/api/companies/accepted');
+                setAccpeteds(res.data);
+            } catch (err) {
+                setError(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error.message}</div>;
+    }
+
     return (
         <RequireAuth requiredUserType={'companies'}>
             <div>
-                {
-                    accepteds.map((accepted) => (
-                        <AcceptedCard key={accepted.google_id} {...accepted} />
-                    ))
-                }
+                {accepteds.map((accepted) => (
+                    <AcceptedCard key={accepted.email} {...accepted} />
+                ))}
             </div>
         </RequireAuth>
     );
 }
+
 
 export function CompanyLayout() {
     const auth = useContext(AuthContext);

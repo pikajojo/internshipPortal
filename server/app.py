@@ -1,4 +1,6 @@
 import os
+import traceback
+
 import requests
 import tempfile
 
@@ -270,13 +272,14 @@ def companies_cease():
 @user_required(user_type='instructors')
 def instructors_to_review():
     instructor_id = session.get('email')
-    to_review_students = db_utils.load_to_review_students_for_instructor(instructor_id)
+    to_review_students = db_utils.load_students_for_instructor(instructor_id, 'toreview')
     return jsonify(to_review_students), 200
+
 @app.get('/api/instructors/reviewed')
 @user_required(user_type='instructors')
 def instructors_reviewed():
     instructor_id = session.get('email')
-    reviewed_students = db_utils.load_reviewed_students_for_instructor(instructor_id)
+    reviewed_students = db_utils.load_students_for_instructor(instructor_id, 'reviewed')
     return jsonify(reviewed_students), 200
 
 @app.post('/api/instructors/message')
@@ -289,12 +292,16 @@ def instructors_send_message():
     if not student_id or not message:
         return jsonify({'error': 'student_id and message are required'}), 400
 
-    result = db_utils.send_message_to_student(session['email'], student_id, message)
-
-    if result:
-        return jsonify({'message': 'Message sent successfully'}), 200
-    else:
-        return jsonify({'error': 'Failed to send message'}), 500
+    try:
+        result = db_utils.send_message_to_student(session['email'], student_id, message)
+        if result:
+            return jsonify({'message': 'Message sent successfully'}), 200
+        else:
+            return jsonify({'error': 'Failed to send message'}), 500
+    except Exception as e:
+        error_message = traceback.format_exc()
+        print(f"Error sending message: {e}\n{error_message}")
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 @app.post('/api/instructors/review')
 @user_required(user_type='instructors')
