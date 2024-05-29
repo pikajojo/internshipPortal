@@ -272,14 +272,14 @@ def companies_cease():
 @user_required(user_type='instructors')
 def instructors_to_review():
     instructor_id = session.get('email')
-    to_review_students = db_utils.load_to_review_students_for_instructor(instructor_id, 'pending')
+    to_review_students = db_utils.load_students_for_instructor(instructor_id, 'toreview')
     return jsonify(to_review_students), 200
 
 @app.get('/api/instructors/reviewed')
 @user_required(user_type='instructors')
 def instructors_reviewed():
     instructor_id = session.get('email')
-    reviewed_students = db_utils.load_reviewed_students_for_instructor(instructor_id)
+    reviewed_students = db_utils.load_students_for_instructor(instructor_id, 'reviewed')
     return jsonify(reviewed_students), 200
 
 @app.post('/api/instructors/message')

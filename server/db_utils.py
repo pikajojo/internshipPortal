@@ -153,16 +153,7 @@ def get_messages_for_company(company_email):
         print("Failed to fetch messages:", e)
         return []
 
-
-def load_to_review_students_for_instructor(instructor_id):
-    instructor = DB['instructors'].find_one({'email': instructor_id})
-    if instructor:
-        to_review_students = list(DB['students'].find({'email': {'$in': instructor.get('pending', [])}}))
-        return to_review_students
-    return []
-
-
-def load_to_review_students_for_instructor(instructor_id, state):
+def load_students_for_instructor(instructor_id, state):
     # Mapper function to transform student data
     def mapper(student_id):
         student_info = DB['students'].find_one({'email': student_id})
@@ -179,13 +170,6 @@ def load_to_review_students_for_instructor(instructor_id, state):
         return None
     students = list(map(mapper, instructor_info[state]))
     return [student for student in students if student is not None]
-
-def load_reviewed_students_for_instructor(instructor_id):
-    instructor = DB['instructors'].find_one({'email': instructor_id})
-    if instructor:
-        reviewed_students = list(DB['students'].find({'email': {'$in': instructor.get('reviewed', [])}}))
-        return reviewed_students
-    return []
 
 def send_message_to_student(instructor_id, student_id, message):
     try:

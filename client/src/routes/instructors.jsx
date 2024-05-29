@@ -196,15 +196,39 @@ function ReviewedCard(props) {
 }
 
 export function InstructorReviewed() {
-    const revieweds = useLoaderData();
+    const [revieweds, setRevieweds] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await axios.get('/api/instructors/reviewed');
+                setRevieweds(res.data);
+            } catch (err) {
+                setError(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error.message}</div>;
+    }
+
     return (
         <RequireAuth requiredUserType={'instructors'}>
             <div>
-                {
-                    revieweds.map((reviewed) => (
-                        <ReviewedCard key={reviewed.google_id} {...reviewed} />
-                    ))
-                }
+                {revieweds.map((reviewed) => (
+                    <ReviewedCard key={reviewed.email} {...reviewed} />
+                ))}
             </div>
         </RequireAuth>
     );
