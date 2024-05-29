@@ -65,6 +65,8 @@ def register():
             data['accepted'] = []
             DB.companies.insert_one(data)
         elif user_type == 'instructors':
+            data['toreview'] = []
+            data['reviewed'] = []
             DB.instructors.insert_one(data)
 
         return jsonify({'status': 'success', 'message': 'Registration successful'})
