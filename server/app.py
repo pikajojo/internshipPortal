@@ -42,11 +42,11 @@ def register():
     username = data['username']
     email = data['email']
     user_type = data['user_type']
-    # 检查数据库中是否存在相同的用户名或邮箱
+    # check if there is same email/username in the database
     if DB.users.find_one({"$or": [{"username": username}, {"email": email}]}):
         return jsonify({'status': 'error', 'message': 'User already exists'})
 
-    # 用户不存在, 可以进行注册
+    # nonexist user can register
     # password = data['password'].encode('utf-8')
     # hashed = bcrypt.hashpw(password, bcrypt.gensalt())
     #hashed = werkzeug.security.generate_password_hash(password)
@@ -83,11 +83,11 @@ def login():
         session['user_type'] = user['user_type']
         print(session['email'])
         print(session['user_type'])
-        # 在这里将 data 作为返回的 JSON 数据的一部分
+
         return jsonify({
             'status': 'success',
             'message': 'Login successful',
-            'data': data  # 将 data 包含在返回的 JSON 中
+            'data': data
         }), 200
     else:
         return jsonify({
@@ -349,7 +349,16 @@ def companies_get_messages():
             return jsonify({"error": "Unauthorized"}), 401
 
         messages_cursor = DB.messages.find({'company_email': company_id})
-        messages = [{message.get('student_Id'), message.get('message')} for message in messages_cursor]
+
+        # messages = [{message.get('student_Id'), message.get('message')} for message in messages_cursor]
+# =======
+        # messages = list(messages_cursor)
+
+        # ensure every message is of dictionary type
+        messages = [message for message in messages_cursor]
+
+        # app.logger.debug(f"Fetched messages for company {company_id}: {messages}")
+
         return json_util.dumps(messages), 200
     except Exception as e:
         # Optionally, you could log the error here if logging is set up
@@ -390,16 +399,12 @@ def students_get_messages():
         if not student_id:
             return jsonify({"error": "Unauthorized"}), 401
 
-        # 从数据库中查询消息，假设 DB 是您的数据库连接对象
         messages_cursor = DB.messages.find({'student_email': student_id})
 
-        # 将游标转换为列表，并确保每个消息都是一个标准的 Python 字典
         messages = [message for message in messages_cursor]
 
-        # 日志记录查询到的消息，用于调试
         # app.logger.debug(f"Fetched messages for student {student_id}: {messages}")
 
-        # 返回 JSON 响应
         return json_util.dumps(messages), 200
     except Exception as e:
         # app.logger.error(f"Error fetching messages: {e}", exc_info=True)
