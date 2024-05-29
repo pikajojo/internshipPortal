@@ -168,15 +168,15 @@ def students_apply():
 
     if company_info is None:
         return jsonify({'error': 'Invalid company data'}), 400
-    if 'pending' not in company_info:
-        company_info['pending'] = []
-        DB.companies.update_one(company_query, {"$set": {'pending': company_info['pending']}})
-    if 'accepted' not in company_info:
-        company_info['accepted'] = []
-        DB.companies.update_one(company_query, {"$set": {'accepted': company_info['accepted']}})
-
-    if (student_id in company_info['pending']) or (student_id in company_info['accepted']):
-        return jsonify({'error': 'Already applied'}), 400
+    # if 'pending' not in company_info:
+    #     company_info['pending'] = []
+    #     DB.companies.update_one(company_query, {"$set": {'pending': company_info['pending']}})
+    # if 'accepted' not in company_info:
+    #     company_info['accepted'] = []
+    #     DB.companies.update_one(company_query, {"$set": {'accepted': company_info['accepted']}})
+    #
+    # if (student_id in company_info['pending']) or (student_id in company_info['accepted']):
+    #     return jsonify({'error': 'Already applied'}), 400
 
     DB.students.update_one(student_query, {"$addToSet": {'pending': company_id}})
     DB.companies.update_one(company_query, {"$addToSet": {'pending': student_id}})
